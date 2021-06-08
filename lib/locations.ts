@@ -1,11 +1,11 @@
-
 export default class Location {
-    getJwt: () => string
-    constructor(getJwt: () => string) {
-        this.getJwt = getJwt
-    }
+  getJwt: () => string;
+  value = 0;
 
-    test() {
-        console.log(this.getJwt())
-    }
+  constructor(getJwt: () => string) {
+    this.getJwt = getJwt;
+  }
+  test() {
+    console.log(`from location: ${this.getJwt()}`);
+  }
 }
