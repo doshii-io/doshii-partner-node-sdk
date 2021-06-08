@@ -1,37 +1,58 @@
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import jwt from "jsonwebtoken";
 import WebSocket from "ws";
-import Locations from "./locations";
-import Orders from "./orders";
+
+import Location from "./location";
+import Order from "./order";
 
 export default class Doshii {
   private readonly clientId: string;
   private readonly clientSecret: string;
+  private readonly url: string;
 
   private websocket!: WebSocket;
 
-  readonly locations: Locations;
-  readonly orders: Orders;
+  readonly location: Location;
+  readonly order: Order;
 
   constructor(clientId: string, clientSecret: string, sandbox = false) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.locations = new Locations(this.getJwt.bind(this));
-    this.orders = new Orders(this.getJwt.bind(this));
+    this.url = sandbox
+      ? "https://sandbox.doshii.co/partner/v3"
+      : "https://live.doshii.co/partner/v3";
 
-    setTimeout(() => {
-      console.log("timers up!");
-      this.orders.orderUpdate({ id: "1", status: "success" });
-    }, 5000);
+    this.location = new Location(this.submitRequest.bind(this));
+    this.order = new Order(this.submitRequest.bind(this));
+
+    // debugging
+    // setTimeout(() => {
+    //   console.log("timers up!");
+    //   this.order.orderUpdate({ id: "1", status: "success" });
+    // }, 5000);
 
     this.websocketSetup(sandbox);
   }
 
-  protected getJwt() {
+  protected async submitRequest(data: AxiosRequestConfig) {
     const payload = {
       clientId: this.clientId,
       timestamp: Date.now(),
     };
-    return jwt.sign(payload, this.clientSecret);
+    try {
+      const resp = await axios({
+        ...data,
+        baseURL: this.url,
+        headers: {
+          ...data.headers,
+          "content-type": "application/json",
+          authorization: `Bearer ${jwt.sign(payload, this.clientSecret)}`,
+        },
+      });
+      return resp;
+    } catch (error) {
+      return error.message;
+    }
   }
 
   private websocketSetup(sandbox: boolean) {
@@ -39,6 +60,9 @@ export default class Doshii {
       ? "wss://sandbox-socket.doshii.co/app/socket?auth="
       : "wss://live-socket.doshii.co/app/socket?auth=";
     const auth = Buffer.from(this.clientId).toString("base64");
+    // debugging
+    // const wsUrl = "wss://echo.websocket.org";
+    // const auth = "";
     this.websocket = new WebSocket(wsUrl + auth);
 
     // send pings every 30s and on open
@@ -79,7 +103,7 @@ export default class Doshii {
     console.debug("Doshii: Recieved message from websocket");
     switch (event.type) {
       case "order_status":
-        this.orders.orderUpdate(event);
+        this.order.orderUpdate(event);
         break;
       default:
         console.info(
