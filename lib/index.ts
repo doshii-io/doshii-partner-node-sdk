@@ -9,16 +9,16 @@ let d = new Doshii(clientId, clientSecret, true);
 //   .then((res) => console.log(res))
 //   .catch((error) => console.error(error));
 
-// d.location
-//   .getAll()
-//   .then((res) => console.log(res))
-//   .catch((error) => console.log(error));
+d.location
+  .getTerminal("41Xrwbor")
+  .then((res) => console.log(res))
+  .catch((error) => console.log(error));
 
-d.order
-  .createOrder("41Xrwbor", sampleData.createOrderSample)
-  .then((res) => {
-    console.log(res);
-  })
-  .catch((rej) => {
-    console.log(rej);
-  });
+// d.order
+//   .createOrder("41Xrwbor", sampleData.createOrderSample)
+//   .then((res) => {
+//     console.log(res);
+//   })
+//   .catch((rej) => {
+//     console.log(rej);
+//   });
