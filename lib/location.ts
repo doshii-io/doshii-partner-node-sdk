@@ -17,17 +17,18 @@ export default class Location {
    * @returns the location details
    */
   async get(locationId?: string) {
-    let requestData: AxiosRequestConfig;
+    let requestData: AxiosRequestConfig = {
+      method: "GET",
+    };
     if (locationId) {
       requestData = {
         url: `/locations/${locationId}`,
-        method: "GET",
         headers: {
           "doshii-location-id": locationId,
         },
       };
     } else {
-      requestData = { url: "/locations", method: "GET" };
+      requestData = { url: "/locations" };
     }
     return await this.requestMaker(requestData);
   }
@@ -39,11 +40,12 @@ export default class Location {
    * @returns location health details
    */
   async getHealth(locationId?: string) {
-    let requestData: AxiosRequestConfig;
+    let requestData: AxiosRequestConfig = {
+      method: "GET",
+    };
     if (locationId) {
       requestData = {
         url: `/health/locations/${locationId}`,
-        method: "GET",
         headers: {
           "doshii-location-id": locationId,
         },
@@ -51,7 +53,6 @@ export default class Location {
     } else {
       requestData = {
         url: "/health/locations",
-        method: "GET",
       };
     }
     return await this.requestMaker(requestData);
@@ -69,18 +70,17 @@ export default class Location {
       headers: {
         "doshii-location-id": locationId,
       },
+      method: "GET",
     };
     if (terminalId) {
       requestData = {
         ...requestData,
         url: `/terminals/${terminalId}`,
-        method: "GET",
       };
     } else {
       requestData = {
         ...requestData,
         url: "/terminals",
-        method: "GET",
       };
     }
     return await this.requestMaker(requestData);
