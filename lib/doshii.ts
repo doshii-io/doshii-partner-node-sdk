@@ -102,17 +102,17 @@ export default class Doshii {
   private onWebsocketMessage(event: any) {
     console.debug("Doshii: Recieved message from websocket");
     const eventData = JSON.parse(event.data);
-    switch (eventData.type) {
-      case "order_status":
-        this.order.orderUpdate(eventData.data);
+    if ("doshii" in eventData && "pong" in eventData.doshii) {
+      console.debug("Doshii: Got pong");
+      return;
+    }
+    switch (eventData.emit[0]) {
+      case "order_updated":
+        this.order.orderUpdate(eventData.emit[1]);
         break;
       default:
-        if ("doshii" in eventData && "pong" in eventData.doshii) {
-          console.debug("Doshii: Got pong");
-        } else {
-          console.info("Doshii: Websocket unknown event");
-          console.info(eventData);
-        }
+        console.info("Doshii: Websocket unknown event");
+        console.info(eventData);
     }
   }
 
