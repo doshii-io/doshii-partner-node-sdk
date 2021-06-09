@@ -28,7 +28,7 @@ export default class Doshii {
     // debugging
     // setTimeout(() => {
     //   console.log("timers up!");
-    //   this.order.orderUpdate({ id: "1", status: "success" });
+    //   this.order.orderUpdate({ id: "1", status: "cancelled" });
     // }, 5000);
 
     this.websocketSetup(sandbox);
@@ -37,7 +37,7 @@ export default class Doshii {
   protected async submitRequest(data: AxiosRequestConfig) {
     const payload = {
       clientId: this.clientId,
-      timestamp: Date.now(),
+      timestamp: Date.now() / 1000,
     };
     try {
       const resp = await axios({
@@ -49,9 +49,9 @@ export default class Doshii {
           authorization: `Bearer ${jwt.sign(payload, this.clientSecret)}`,
         },
       });
-      return resp;
+      return resp.data;
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 
@@ -101,14 +101,18 @@ export default class Doshii {
 
   private onWebsocketMessage(event: any) {
     console.debug("Doshii: Recieved message from websocket");
-    switch (event.type) {
+    const eventData = JSON.parse(event.data);
+    switch (eventData.type) {
       case "order_status":
-        this.order.orderUpdate(event);
+        this.order.orderUpdate(eventData.data);
         break;
       default:
-        console.info(
-          `Doshii: Websocket invalid event - ${JSON.stringify(event)}`
-        );
+        if ("doshii" in eventData && "pong" in eventData.doshii) {
+          console.debug("Doshii: Got pong");
+        } else {
+          console.info("Doshii: Websocket unknown event");
+          console.info(eventData);
+        }
     }
   }
 
