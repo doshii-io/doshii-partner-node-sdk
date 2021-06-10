@@ -7,7 +7,7 @@ import Order from "./order";
 
 import { LogLevel, Logger } from './utils';
 
-enum WebSocketEvents {
+export enum WebSocketEvents {
   ORDER_UPDATED = 'order_updated',
   ORDER_CREATED = 'order_created',
   TRANSACTION_UPDATED = 'transaction_updated',
@@ -73,7 +73,7 @@ export default class Doshii {
   protected async submitRequest(data: AxiosRequestConfig) {
     const payload = {
       clientId: this.clientId,
-      timestamp: Date.now() / 1000,
+      timestamp: Math.round(Date.now() / 1000),
     };
     try {
       const resp = await axios({
@@ -136,7 +136,7 @@ export default class Doshii {
 
   }
 
-  private subscribeToWebsockeEvent(event: WebSocketEvents, callbacks: Array<(data: any) => void>) {
+  subscribeToWebsockeEvent(event: WebSocketEvents, callbacks: Array<(data: any) => void>) {
     if (callbacks.length < 1) {
       throw new Error('Doshii: No callbacks specified.')
     }
@@ -154,7 +154,7 @@ export default class Doshii {
     this.subscribers.set(subscriberId, callbacks)
   }
 
-  private unsubscribeFromWebsocketEvent(subscriberId: string, event: WebSocketEvents) {
+  unsubscribeFromWebsocketEvent(subscriberId: string, event: WebSocketEvents) {
 
     if (!this.eventSubscribers.has(event)) {
       throw new Error(`Doshii: No subscribers for event - ${event}`)
@@ -173,8 +173,8 @@ export default class Doshii {
   }
 
   clearWebsocketSubscriptions() {
-    this.subscribers.clear()
     this.eventSubscribers.clear()
+    this.subscribers.clear()
   }
 
   private onWebsocketMessage(event: any) {
