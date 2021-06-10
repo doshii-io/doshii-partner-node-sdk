@@ -5,17 +5,53 @@ import WebSocket from "ws";
 import Location from "./location";
 import Order from "./order";
 
+import { LogLevel, Logger } from './utils';
+
+enum WebSocketEvents {
+  ORDER_UPDATED = 'order_updated',
+  ORDER_CREATED = 'order_created',
+  TRANSACTION_UPDATED = 'transaction_updated',
+  BOOKING_CREATED = 'booking_created',
+  BOOKING_UPDATED = 'booking_updated',
+  CHECKIN_CREATED = 'checkin_created',
+  CHECKIN_UPDATED = 'ckeckin_updated',
+  CHECKIN_DELETED = 'checkin_deleted',
+  MENU_UPDATED = 'menu_updated',
+  POINTS_REDEEMED = 'points_redemption',
+  REWARD_REDEEMED = 'reward_redemption',
+  TABLE_CREATED = 'table_created',
+  TABLE_REMOVED = 'table_removed',
+  TABLE_UPDATED = 'table_updated',
+  TABLE_BULK_UPDATED = 'table_bulk_updated',
+  CARD_ACTIVATION_REQUESTED = 'card_activate',
+  CARD_ENQUIRY_REQUESTED = 'card_enquiry',
+  ORDER_PREPROCESSED = 'order_preprocess',
+  LOCATION_SUBSCRIBED = 'location_subscription',
+  LOCATION_HOURS_UPDATED = 'location_hours_updated',
+  APP_MENU_UPDATED = 'app_menu_updated',
+  APP_MENU_ITEM_UPDATED = 'app_menu_item_updated',
+  LOYALTY_CHECKIN_CREATED = 'loyalty_checkin_created',
+  LOYALTY_CHECKIN_UPDATED = 'loyalty_checkin_updated',
+  LOYALTY_CHECKIN_DELETED = 'loyalty_checkin_deleted',
+  PING = 'ping'
+}
+
 export default class Doshii {
   private readonly clientId: string;
   private readonly clientSecret: string;
   private readonly url: string;
+  private readonly logger: Logger;
 
+  // websocket and subscribers
   private websocket!: WebSocket;
+  private subscribers: Map<string, Array<(data: any) => void>> = new Map();
+  private eventSubscribers: Map<WebSocketEvents, Array<string>> = new Map();
 
   readonly location: Location;
   readonly order: Order;
 
-  constructor(clientId: string, clientSecret: string, sandbox = false) {
+  constructor(clientId: string, clientSecret: string, sandbox = false, logLevel = LogLevel.WARN) {
+    this.logger = new Logger(logLevel);
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.url = sandbox
@@ -27,7 +63,7 @@ export default class Doshii {
 
     // debugging
     // setTimeout(() => {
-    //   console.log("timers up!");
+    //   this.logger.log("timers up!");
     //   this.order.orderUpdate({ id: "1", status: "cancelled" });
     // }, 5000);
 
@@ -67,9 +103,9 @@ export default class Doshii {
 
     // send pings every 30s and on open
     this.websocket.onopen = () => {
-      console.debug("Doshii: Opened websocket");
+      this.logger.debug("Doshii: Opened websocket");
       const heartbeat = () => {
-        console.debug("Doshii: Sending heartbeat to websocket");
+        this.logger.debug("Doshii: Sending heartbeat to websocket");
         this.websocket.send(
           JSON.stringify({
             doshii: {
@@ -78,7 +114,7 @@ export default class Doshii {
             },
           })
         );
-        console.debug("Doshii: Heartbeat sent to websocket");
+        this.logger.debug("Doshii: Heartbeat sent to websocket");
       };
       // Send one immediately to complete the handshake
       heartbeat();
@@ -86,43 +122,104 @@ export default class Doshii {
       setInterval(heartbeat, 30000);
     };
 
-    this.websocket.onmessage = (event) => {
+    this.websocket.onmessage = (event: any) => {
       this.onWebsocketMessage(event);
     };
 
-    this.websocket.onerror = (event) => {
+    this.websocket.onerror = (event: any) => {
       this.onWebsocketError(event);
     };
 
-    this.websocket.onclose = (event) => {
+    this.websocket.onclose = (event: any) => {
       this.onWebsocketClose(event);
     };
+
+  }
+
+  private subscribeToWebsockeEvent(event: WebSocketEvents, callbacks: Array<(data: any) => void>) {
+    if (callbacks.length < 1) {
+      throw new Error('Doshii: No callbacks specified.')
+    }
+
+    const subscriberId = Date.now().toString(36)
+    this.subscribers.set(subscriberId, callbacks)
+
+    if (this.eventSubscribers.has(event)) {
+      let subscribers = this.eventSubscribers.get(event)
+      subscribers!.concat(subscriberId)
+      this.eventSubscribers.set(event, subscribers!)
+    } else {
+      this.eventSubscribers.set(event, [subscriberId])
+    }
+    this.subscribers.set(subscriberId, callbacks)
+  }
+
+  private unsubscribeFromWebsocketEvent(subscriberId: string, event: WebSocketEvents) {
+
+    if (!this.eventSubscribers.has(event)) {
+      throw new Error(`Doshii: No subscribers for event - ${event}`)
+    }
+
+    // remove from eventSubscriber Map
+    const subscribers = this.eventSubscribers.get(event)
+    let newSubscribers: Array<string> = []
+    for (let i = 0; i < subscribers!.length; i++) {
+      const subscriber = subscribers![i]
+      if (subscriber !== subscriberId) {
+        newSubscribers.push(subscriber)
+      }
+    }
+    this.subscribers.delete(subscriberId)
+  }
+
+  clearWebsocketSubscriptions() {
+    this.subscribers.clear()
+    this.eventSubscribers.clear()
   }
 
   private onWebsocketMessage(event: any) {
-    console.debug("Doshii: Recieved message from websocket");
+    this.logger.debug("Doshii: Recieved message from websocket");
     const eventData = JSON.parse(event.data);
     if ("doshii" in eventData && "pong" in eventData.doshii) {
-      console.debug("Doshii: Got pong");
+      this.logger.debug("Doshii: Got pong");
+      this.notifySubscribers(WebSocketEvents.PING, eventData)
       return;
     }
-    switch (eventData.emit[0]) {
-      case "order_updated":
-        this.order.orderUpdate(eventData.emit[1]);
-        break;
-      default:
-        console.info("Doshii: Websocket unknown event");
-        console.info(eventData);
+    const eventType = eventData.emit[0]
+    const eventPayload = eventData.emit[1]
+    this.notifySubscribers(eventType, eventPayload)
+
+  }
+
+  private notifySubscribers(event: WebSocketEvents, data: any) {
+    // get subscribers for the event
+    if (!this.eventSubscribers.has(event)) return
+    const subscribers = this.eventSubscribers.get(event)
+    if (!subscribers || subscribers.length < 1) return
+    // get callback func for each subscriber and exec
+    for (let i = 0; i < subscribers.length; i++) {
+      const subscriber = subscribers[i]
+      if (!this.subscribers.has(subscriber)) continue
+      const callbacks = this.subscribers.get(subscriber)
+      if (!callbacks || callbacks.length < 1) continue
+      for (let j = 0; j < callbacks.length; j++) {
+        try {
+          callbacks[j](data)
+        } catch (error) {
+          this.logger.error(`Doshii: Error while executing callback for subscriber ${subscriber}`)
+          this.logger.error(error)
+        }
+      }
     }
   }
 
   private onWebsocketError(event: any) {
-    console.error(
+    this.logger.warn(
       `Doshii: Recieved error from websocket - ${JSON.stringify(event.data)}`
     );
   }
 
   private onWebsocketClose(event: any) {
-    console.info(`Doshii: Closed websocket - ${JSON.stringify(event.data)}`);
+    this.logger.warn(`Doshii: Closed websocket - ${JSON.stringify(event.data)}`);
   }
 }

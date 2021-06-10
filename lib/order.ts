@@ -1,5 +1,5 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { fileURLToPath } from "url";
+import { LogLevel, Logger } from "./utils";
 
 enum OrderStatus {
   Pending = "pending",
@@ -47,7 +47,6 @@ type OrderRetrivalFilters = {
 };
 
 export default class Order {
-  // static readonly OrderStatus = _OrderStatus
   private orders = new Map<
     string,
     {
@@ -58,9 +57,11 @@ export default class Order {
     }
   >();
   private readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  private readonly logger: Logger;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>, logLevel = LogLevel.ERROR) {
     this.requestMaker = requestMaker;
+    this.logger = new Logger(logLevel);
   }
 
   /*
@@ -77,7 +78,7 @@ export default class Order {
       data,
     });
 
-    console.log(response);
+    this.logger.log(response);
     /*
     save to orders so that the status can be 
     updated when recieved from websocket
@@ -96,8 +97,8 @@ export default class Order {
       status: response.status,
       details: response,
     });
-    console.log(result);
-    console.log(this.orders);
+    this.logger.log(result);
+    this.logger.log(this.orders);
     return result;
   }
 
@@ -108,14 +109,14 @@ export default class Order {
       : undefined;
 
     if (promiseControls) {
-      console.debug("Doshii: Got orderUpdate");
-      console.debug(data);
-      console.log(promiseControls);
+      this.logger.debug("Doshii: Got orderUpdate");
+      this.logger.debug(data);
+      this.logger.log(promiseControls);
       if (data.status == OrderStatus.Complete) {
         // resolve the promise if order is complete and
         // remove from oders cache
-        console.log("Order complete -------------");
-        console.log(data);
+        this.logger.log("Order complete -------------");
+        this.logger.log(data);
         promiseControls.resolve(data);
         this.orders.delete(data.id);
       } else if (
@@ -127,20 +128,20 @@ export default class Order {
       ) {
         // Reject promise if order didnt go through
         // remove from oders cache
-        console.log("Order rejected -------------");
-        console.log(data);
+        this.logger.log("Order rejected -------------");
+        this.logger.log(data);
         promiseControls.reject(data);
         this.orders.delete(data.id);
       } else {
         // Update order status in cache
-        console.log("Order update -------------");
-        console.log(data);
+        this.logger.log("Order update -------------");
+        this.logger.log(data);
         promiseControls.status = data.status;
-        console.log(promiseControls);
+        this.logger.log(promiseControls);
       }
     } else {
-      console.log("Unknown Order update -------------");
-      console.log(data);
+      this.logger.log("Unknown Order update -------------");
+      this.logger.log(data);
     }
   }
 
@@ -282,4 +283,40 @@ export default class Order {
       data,
     });
   }
+
+  /**
+   * Create a new Transaction against an Order
+   * @param locationId hashed location ID of the location
+   * @param orderId Order ID 
+   * @param data Transaction data 
+   * @returns The transaction that was created
+   */
+  async createTransaction(locationId: string, orderId: string, data: any) {
+    return await this.requestMaker({
+      url: `/orders/${orderId}/transactions`,
+      method: "POST",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+      data,
+    });
+  }
+
+  /**
+   * Retrieve a list of transactions associated to an Order by the Order ID
+   * @param locationId hashed location ID of the location
+   * @param orderId Order ID 
+   * @returns The transaction that was deleted
+   *
+   */
+  async getTransactions(locationId: string, orderId: string) {
+    return await this.requestMaker({
+      url: `/orders/${orderId}/transactions`,
+      method: "GET",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+    });
+  }
+
 }
