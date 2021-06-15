@@ -9,6 +9,7 @@ import Transaction from "./transaction";
 import Webhook from "./webhook";
 import Booking from "./booking";
 import Table from "./table";
+import Menu from "./menu";
 
 import { LogLevel, Logger } from "./utils";
 
@@ -63,6 +64,7 @@ export default class Doshii {
   readonly transaction: Transaction;
   readonly booking: Booking;
   readonly table: Table;
+  readonly menu: Menu;
 
   constructor(
     clientId: string,
@@ -85,6 +87,7 @@ export default class Doshii {
     this.transaction = new Transaction(this.submitRequest.bind(this));
     this.booking = new Booking(this.submitRequest.bind(this));
     this.table = new Table(this.submitRequest.bind(this));
+    this.menu = new Menu(this.submitRequest.bind(this));
 
     this.sandbox = sandbox;
   }
