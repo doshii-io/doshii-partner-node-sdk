@@ -4,7 +4,11 @@ import WebSocket from "ws";
 
 import Location from "./location";
 import Order from "./order";
-import Devices from "./devices";
+import Device from "./device";
+import Transaction from "./transaction";
+import Webhook from "./webhook";
+import Booking from "./booking";
+import Table from "./table";
 
 import { LogLevel, Logger } from "./utils";
 
@@ -34,7 +38,7 @@ export enum WebSocketEvents {
   LOYALTY_CHECKIN_CREATED = "loyalty_checkin_created",
   LOYALTY_CHECKIN_UPDATED = "loyalty_checkin_updated",
   LOYALTY_CHECKIN_DELETED = "loyalty_checkin_deleted",
-  PING = "ping",
+  PONG = "pong",
 }
 
 export default class Doshii {
@@ -54,7 +58,11 @@ export default class Doshii {
 
   readonly location: Location;
   readonly order: Order;
-  readonly devices: Devices;
+  readonly device: Device;
+  readonly webhook: Webhook;
+  readonly transaction: Transaction;
+  readonly booking: Booking;
+  readonly table: Table;
 
   constructor(
     clientId: string,
@@ -72,15 +80,13 @@ export default class Doshii {
 
     this.location = new Location(this.submitRequest.bind(this));
     this.order = new Order(this.submitRequest.bind(this));
-    this.devices = new Devices(this.submitRequest.bind(this));
+    this.device = new Device(this.submitRequest.bind(this));
+    this.webhook = new Webhook(this.submitRequest.bind(this));
+    this.transaction = new Transaction(this.submitRequest.bind(this));
+    this.booking = new Booking(this.submitRequest.bind(this));
+    this.table = new Table(this.submitRequest.bind(this));
 
-    // debugging
-    // setTimeout(() => {
-    //   this.logger.log("timers up!");
-    //   this.order.orderUpdate({ id: "1", status: "cancelled" });
-    // }, 5000);
     this.sandbox = sandbox;
-    // this.websocketSetup(sandbox);
   }
 
   protected async submitRequest(data: AxiosRequestConfig) {
@@ -151,8 +157,8 @@ export default class Doshii {
       this.onWebsocketError(event);
     };
 
-    this.websocket.onclose = (event: any) => {
-      this.onWebsocketClose(event);
+    this.websocket.onclose = () => {
+      this.onWebsocketClose();
     };
   }
 
@@ -272,7 +278,7 @@ export default class Doshii {
     const eventData = JSON.parse(event.data);
     if ("doshii" in eventData && "pong" in eventData.doshii) {
       this.logger.debug("Doshii: Got pong");
-      this.notifySubscribers(WebSocketEvents.PING, eventData);
+      this.notifySubscribers(WebSocketEvents.PONG, eventData);
       return;
     }
     const eventType = eventData.emit[0];
@@ -314,9 +320,7 @@ export default class Doshii {
     );
   }
 
-  private onWebsocketClose(event: any) {
-    this.logger.warn(
-      `Doshii: Closed websocket - ${JSON.stringify(event.data)}`
-    );
+  private onWebsocketClose() {
+    this.logger.warn("Doshii: Websocket closed ");
   }
 }

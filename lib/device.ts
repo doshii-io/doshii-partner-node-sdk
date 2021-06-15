@@ -3,7 +3,7 @@ import { AxiosRequestConfig } from "axios";
 /**
  * Devices API
  */
-export default class Devices {
+export default class Device {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
 
   constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
@@ -19,7 +19,7 @@ export default class Devices {
   async get(deviceId?: string) {
     let url = "/devices";
     if (deviceId) {
-      url += deviceId;
+      url += `/${deviceId}`;
     }
     return await this.requestMaker({
       url,
@@ -32,10 +32,11 @@ export default class Devices {
    * @returns the registered device
    *
    */
-  async registerDevice() {
+  async registerDevice(data: any) {
     return await this.requestMaker({
       url: "/devices",
       method: "POST",
+      data,
     });
   }
 
@@ -44,10 +45,11 @@ export default class Devices {
    * @param deviceId The hashed ID of the registered device to update
    * @returns The updated device
    */
-  async updateDevice(deviceId: string) {
+  async updateDevice(deviceId: string, data: any) {
     return await this.requestMaker({
       url: `/devices/${deviceId}`,
       method: "PUT",
+      data,
     });
   }
 
