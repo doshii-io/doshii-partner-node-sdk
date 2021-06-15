@@ -2,12 +2,15 @@
   "name": "doshii-sdk",
   "version": "2.0.0",
   "description": "Module for Doshii partner APIs",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/doshii",
+  "types": "dist/doshii.d.ts",
+  "files": [
+    "/dist"
+  ],
   "repository": "https://github.com/doshii-io/doshii-partner-node-sdk.git",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "tsc",
+    "build": "rm dist -rf  && tsc",
     "test": "echo \"No tests just yet\""
   },
   "keywords": [
@@ -27,6 +30,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "jsonwebtoken": "^8.5.1",
+    "tslib": "^2.3.0",
     "ws": "^7.4.6"
   }
 }

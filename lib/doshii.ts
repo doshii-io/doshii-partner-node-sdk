@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import jwt from "jsonwebtoken";
 import WebSocket from "ws";
 
@@ -39,6 +39,7 @@ export enum WebSocketEvents {
 export default class Doshii {
   private readonly clientId: string;
   private readonly clientSecret: string;
+  private readonly sandbox: boolean;
   private readonly url: string;
   private readonly logger: Logger;
 
@@ -75,8 +76,8 @@ export default class Doshii {
     //   this.logger.log("timers up!");
     //   this.order.orderUpdate({ id: "1", status: "cancelled" });
     // }, 5000);
-
-    this.websocketSetup(sandbox);
+    this.sandbox = sandbox;
+    // this.websocketSetup(sandbox);
   }
 
   protected async submitRequest(data: AxiosRequestConfig) {
@@ -113,8 +114,16 @@ export default class Doshii {
     // send pings every 30s and on open
     this.websocket.onopen = () => {
       this.logger.debug("Doshii: Opened websocket");
-      const heartbeat = () => {
-        this.logger.debug("Doshii: Sending heartbeat to websocket");
+      const ping = (autoClose: boolean = false) => {
+        if (autoClose && this.subscribers.size < 1) {
+          this.logger.info(
+            "Doshii: Closing websocket as no subscribers, subscribing to an event will start the websocket automatically"
+          );
+          this.websocket.close();
+          clearInterval(heartbeat);
+          return;
+        }
+        this.logger.debug("Doshii: Sending ping to websocket");
         this.websocket.send(
           JSON.stringify({
             doshii: {
@@ -123,12 +132,12 @@ export default class Doshii {
             },
           })
         );
-        this.logger.debug("Doshii: Heartbeat sent to websocket");
+        this.logger.debug("Doshii: Ping sent to websocket");
       };
       // Send one immediately to complete the handshake
-      heartbeat();
+      ping();
       // Then 30 every seconds or so thereafter to keep alive
-      setInterval(heartbeat, 30000);
+      const heartbeat = setInterval(ping, 30000, true);
     };
 
     this.websocket.onmessage = (event: any) => {
@@ -154,6 +163,10 @@ export default class Doshii {
     events: Array<WebSocketEvents>,
     callback: (data: any) => void
   ) {
+    // If first subscriber start websocket
+    if (this.subscribers.size < 1) {
+      this.websocketSetup(this.sandbox);
+    }
     // Add to subscribers map
     const subscriberId = Date.now().toString(36);
     this.subscribers.set(subscriberId, { callback: callback, events: events });

@@ -1,16 +1,13 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { LogLevel, Logger } from './utils';
+import { AxiosRequestConfig } from "axios";
 
 /**
  * Location API
  */
 export default class Location {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
-  private readonly logger: Logger;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>, logLevel = LogLevel.WARN) {
+  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
-    this.logger = new Logger(logLevel);
   }
 
   /**

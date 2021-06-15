@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosRequestConfig } from "axios";
 import { LogLevel, Logger } from "./utils";
 
 enum OrderStatus {
@@ -59,7 +59,10 @@ export default class Order {
   private readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
   private readonly logger: Logger;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>, logLevel = LogLevel.ERROR) {
+  constructor(
+    requestMaker: (data: AxiosRequestConfig) => Promise<any>,
+    logLevel = LogLevel.ERROR
+  ) {
     this.requestMaker = requestMaker;
     this.logger = new Logger(logLevel);
   }
@@ -287,8 +290,8 @@ export default class Order {
   /**
    * Create a new Transaction against an Order
    * @param locationId hashed location ID of the location
-   * @param orderId Order ID 
-   * @param data Transaction data 
+   * @param orderId Order ID
+   * @param data Transaction data
    * @returns The transaction that was created
    */
   async createTransaction(locationId: string, orderId: string, data: any) {
@@ -305,7 +308,7 @@ export default class Order {
   /**
    * Retrieve a list of transactions associated to an Order by the Order ID
    * @param locationId hashed location ID of the location
-   * @param orderId Order ID 
+   * @param orderId Order ID
    * @returns The transaction that was deleted
    *
    */
@@ -318,5 +321,4 @@ export default class Order {
       },
     });
   }
-
 }
