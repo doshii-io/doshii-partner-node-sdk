@@ -4,6 +4,7 @@ import WebSocket from "ws";
 
 import Location from "./location";
 import Order from "./order";
+import Devices from "./devices";
 
 import { LogLevel, Logger } from "./utils";
 
@@ -53,6 +54,7 @@ export default class Doshii {
 
   readonly location: Location;
   readonly order: Order;
+  readonly devices: Devices;
 
   constructor(
     clientId: string,
@@ -70,6 +72,7 @@ export default class Doshii {
 
     this.location = new Location(this.submitRequest.bind(this));
     this.order = new Order(this.submitRequest.bind(this));
+    this.devices = new Devices(this.submitRequest.bind(this));
 
     // debugging
     // setTimeout(() => {
