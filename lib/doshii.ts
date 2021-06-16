@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import WebSocket from "ws";
 
 import Location from "./location";
@@ -51,6 +52,8 @@ export default class Doshii {
   private readonly url: string;
   private readonly logger: Logger;
 
+  private apiKey = "";
+
   // websocket and subscribers
   private websocket!: WebSocket;
   private subscribers: Map<
@@ -73,6 +76,7 @@ export default class Doshii {
   constructor(
     clientId: string,
     clientSecret: string,
+    appId?: string,
     sandbox = false,
     apiVersion = 3,
     logLevel = LogLevel.WARN
@@ -96,6 +100,16 @@ export default class Doshii {
     this.checkin = new Checkin(this.submitRequest.bind(this));
 
     this.sandbox = sandbox;
+
+    if (appId) {
+      this.generateApiKey(appId);
+    }
+  }
+
+  private generateApiKey(appId: string) {
+    // generate the x-api-key for bulk data requests
+    const hasher = crypto.createHmac("sha256", this.clientSecret);
+    this.apiKey = `${hasher.update(this.clientId).digest("hex")}:${appId}`;
   }
 
   protected async submitRequest(data: AxiosRequestConfig) {
@@ -108,9 +122,9 @@ export default class Doshii {
         ...data,
         baseURL: this.url,
         headers: {
-          ...data.headers,
           "content-type": "application/json",
           authorization: `Bearer ${jwt.sign(payload, this.clientSecret)}`,
+          ...data.headers,
         },
       });
       return resp.data;
@@ -341,6 +355,62 @@ export default class Doshii {
     return this.submitRequest({
       url: code ? `/rejection_codes/${code}` : "/rejection_codes",
       method: "GET",
+    });
+  }
+
+  /**
+   *
+   * Submit an asynchronous data aggregation request.
+   * @param dataset The dataset that was requested to be aggregated. Current supported value is orders.
+   * @param appId required if not provided during class instantiation else not required
+   * @returns The registered bulk data request
+   */
+  requestBulkDataAggregation(dataset = "orders", appId?: string) {
+    if (!this.apiKey) {
+      if (!appId) {
+        throw new Error(
+          "Doshii: appId is required as Doshii class was instantiated without it"
+        );
+      }
+      this.generateApiKey(appId);
+    }
+
+    return this.submitRequest({
+      url: `/data/${dataset}`,
+      method: "POST",
+      headers: {
+        "X-API-KEY": this.apiKey,
+      },
+    });
+  }
+
+  /**
+   * Retrieve the current status of a previously submitted data aggregation request.
+   * @param requestId Unique ID identifying this request.
+   * @param dataset The dataset that was requested to be aggregated. Current supported value is orders.
+   * @param appId required if not provided during class instantiation else not required
+   * @returns The registered bulk data request
+   */
+  getBulkDataAggregationStatus(
+    requestId: string,
+    dataset = "orders",
+    appId?: string
+  ) {
+    if (!this.apiKey) {
+      if (!appId) {
+        throw new Error(
+          "Doshii: appId is required as Doshii class was instantiated without it"
+        );
+      }
+      this.generateApiKey(appId);
+    }
+
+    return this.submitRequest({
+      url: `/data/${dataset}/${requestId}`,
+      method: "GET",
+      headers: {
+        "X-API-KEY": this.apiKey,
+      },
     });
   }
 }
