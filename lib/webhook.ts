@@ -47,7 +47,7 @@ export default class Webhook {
    * If not provided all the registered webhooks are retrieved
    * @returns a list of webhooks or just once webhook if event is provided
    */
-  async get(event?: WebSocketEvents) {
+  async get(event?: WebhookEvents) {
     let url = "/webhooks";
     if (event) {
       url += `/${event}`;
@@ -91,12 +91,12 @@ export default class Webhook {
 
   /**
    * Remove a webhook subscription from your application
-   * @param event The name of the Doshii event that the webhook subscription is being retrieved for.
-   * @returns The deleted event
+   * @param event The name of the Doshii event that the webhook subscription is being removed from.
+   * @returns status code of the operation
    */
   async unregisterWebhook(event: WebhookEvents) {
     return await this.requestMaker({
-      url: "/webhooks",
+      url: `/webhooks/${event}`,
       method: "DELETE",
     });
   }

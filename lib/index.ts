@@ -1,3 +1,3 @@
 export { default, WebSocketEvents } from "./doshii";
 export { LogLevel } from "./utils";
-export { WebhookEvents } from "./webhooks";
+export { WebhookEvents } from "./webhook";

@@ -145,4 +145,5 @@ export default class Booking {
       },
       data,
     });
+  }
 }
