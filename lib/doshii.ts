@@ -11,6 +11,7 @@ import Booking from "./booking";
 import Table from "./table";
 import Menu from "./menu";
 import Loyalty from "./loyalty";
+import Checkin from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
 
@@ -67,6 +68,7 @@ export default class Doshii {
   readonly table: Table;
   readonly menu: Menu;
   readonly loyalty: Loyalty;
+  readonly checkin: Checkin;
 
   constructor(
     clientId: string,
@@ -91,6 +93,7 @@ export default class Doshii {
     this.table = new Table(this.submitRequest.bind(this));
     this.menu = new Menu(this.submitRequest.bind(this));
     this.loyalty = new Loyalty(this.submitRequest.bind(this));
+    this.checkin = new Checkin(this.submitRequest.bind(this));
 
     this.sandbox = sandbox;
   }

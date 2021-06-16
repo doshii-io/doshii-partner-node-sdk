@@ -51,7 +51,7 @@ export default class Loyalty {
       return this.requestMaker({
         ...req,
         url: "loyalty/checkins",
-        params: options,
+        params,
       });
     }
   }
