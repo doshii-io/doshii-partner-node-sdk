@@ -23,12 +23,12 @@ export default class Menu {
     }
   ) {
     return await this.requestMaker({
-      url = `/locations/${locationId}/menu`,
+      url: `/locations/${locationId}/menu`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
       },
-      params = options,
+      params: options,
     });
   }
 
@@ -48,12 +48,12 @@ export default class Menu {
     }
   ) {
     return await this.requestMaker({
-      url = `/locations/${locationId}/menu/products/${posId}`,
+      url: `/locations/${locationId}/menu/products/${posId}`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
       },
-      params = options,
+      params: options,
     });
   }
 
@@ -73,12 +73,12 @@ export default class Menu {
     }
   ) {
     return await this.requestMaker({
-      url = `/locations/${locationId}/menu/options/${posId}`,
+      url: `/locations/${locationId}/menu/options/${posId}`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
       },
-      params = options,
+      params: options,
     });
   }
 
@@ -98,12 +98,12 @@ export default class Menu {
     }
   ) {
     return await this.requestMaker({
-      url = `/locations/${locationId}/menu/surcounts/${posId}`,
+      url: `/locations/${locationId}/menu/surcounts/${posId}`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
       },
-      params = options,
+      params: options,
     });
   }
 }

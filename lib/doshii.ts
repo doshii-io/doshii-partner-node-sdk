@@ -10,6 +10,7 @@ import Webhook from "./webhook";
 import Booking from "./booking";
 import Table from "./table";
 import Menu from "./menu";
+import Loyalty from "./loyalty";
 
 import { LogLevel, Logger } from "./utils";
 
@@ -65,6 +66,7 @@ export default class Doshii {
   readonly booking: Booking;
   readonly table: Table;
   readonly menu: Menu;
+  readonly loyalty: Loyalty;
 
   constructor(
     clientId: string,
@@ -88,6 +90,7 @@ export default class Doshii {
     this.booking = new Booking(this.submitRequest.bind(this));
     this.table = new Table(this.submitRequest.bind(this));
     this.menu = new Menu(this.submitRequest.bind(this));
+    this.loyalty = new Loyalty(this.submitRequest.bind(this));
 
     this.sandbox = sandbox;
   }
@@ -163,6 +166,57 @@ export default class Doshii {
     this.websocket.onclose = () => {
       this.onWebsocketClose();
     };
+  }
+
+  private onWebsocketMessage(event: any) {
+    this.logger.debug("Doshii: Recieved message from websocket");
+    const eventData = JSON.parse(event.data);
+    if ("doshii" in eventData && "pong" in eventData.doshii) {
+      this.logger.debug("Doshii: Got pong");
+      this.notifySubscribers(WebSocketEvents.PONG, eventData);
+      return;
+    }
+    const eventType = eventData.emit[0];
+    const eventPayload = eventData.emit[1];
+    this.notifySubscribers(eventType, eventPayload);
+  }
+
+  private notifySubscribers(event: WebSocketEvents, data: any) {
+    // get subscribers for the event
+    if (!this.eventSubscribers.has(event)) return;
+    const subscribers = this.eventSubscribers.get(event);
+
+    if (!subscribers || !subscribers.length) {
+      this.eventSubscribers.delete(event);
+      return;
+    }
+
+    // get callback func for each subscriber and exec
+    for (const subscriber of subscribers) {
+      if (!this.subscribers.has(subscriber)) continue;
+      const { callback } = this.subscribers.get(subscriber)!;
+      if (!callback || event.length < 1) {
+        this.subscribers.delete(subscriber);
+      }
+      try {
+        callback(data);
+      } catch (error) {
+        this.logger.error(
+          `Doshii: Error while executing callback for subscriber ${subscriber}`
+        );
+        this.logger.error(error);
+      }
+    }
+  }
+
+  private onWebsocketError(event: any) {
+    this.logger.warn(
+      `Doshii: Recieved error from websocket - ${JSON.stringify(event.data)}`
+    );
+  }
+
+  private onWebsocketClose() {
+    this.logger.warn("Doshii: Websocket closed ");
   }
 
   /**
@@ -276,54 +330,14 @@ export default class Doshii {
     this.subscribers.clear();
   }
 
-  private onWebsocketMessage(event: any) {
-    this.logger.debug("Doshii: Recieved message from websocket");
-    const eventData = JSON.parse(event.data);
-    if ("doshii" in eventData && "pong" in eventData.doshii) {
-      this.logger.debug("Doshii: Got pong");
-      this.notifySubscribers(WebSocketEvents.PONG, eventData);
-      return;
-    }
-    const eventType = eventData.emit[0];
-    const eventPayload = eventData.emit[1];
-    this.notifySubscribers(eventType, eventPayload);
-  }
-
-  private notifySubscribers(event: WebSocketEvents, data: any) {
-    // get subscribers for the event
-    if (!this.eventSubscribers.has(event)) return;
-    const subscribers = this.eventSubscribers.get(event);
-
-    if (!subscribers || !subscribers.length) {
-      this.eventSubscribers.delete(event);
-      return;
-    }
-
-    // get callback func for each subscriber and exec
-    for (const subscriber of subscribers) {
-      if (!this.subscribers.has(subscriber)) continue;
-      const { callback } = this.subscribers.get(subscriber)!;
-      if (!callback || event.length < 1) {
-        this.subscribers.delete(subscriber);
-      }
-      try {
-        callback(data);
-      } catch (error) {
-        this.logger.error(
-          `Doshii: Error while executing callback for subscriber ${subscriber}`
-        );
-        this.logger.error(error);
-      }
-    }
-  }
-
-  private onWebsocketError(event: any) {
-    this.logger.warn(
-      `Doshii: Recieved error from websocket - ${JSON.stringify(event.data)}`
-    );
-  }
-
-  private onWebsocketClose() {
-    this.logger.warn("Doshii: Websocket closed ");
+  /**
+   * Retrieve all rejection codes
+   * @returns List of all rejection codes
+   */
+  async getRejectionCodes(code: string) {
+    return this.submitRequest({
+      url: code ? `/rejection_codes/${code}` : "/rejection_codes",
+      method: "GET",
+    });
   }
 }

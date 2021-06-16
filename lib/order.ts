@@ -13,37 +13,37 @@ enum OrderStatus {
 type OrderRetrivalFilters = {
   /**Comma separated list of statuses.
    * Defaults to accepting all. eg. pending,accepted. */
-  status: string;
+  status?: string;
   /**The POS reference for the order. */
-  posRef: string;
+  posRef?: string;
   /**The optional external order
    * reference provided by the Partner when the order was created. */
-  externalOrderRef: string;
+  externalOrderRef?: string;
   /**A Unix timestamp (seconds) that orders were created at or later than */
-  from: number;
+  from?: Date;
   /**A Unix timestamp (seconds) that orders were created at or before than */
-  to: number;
+  to?: Date;
   /**Sort ascending or descending by order creation date. Default is desc. */
-  sort: string;
+  sort?: string;
   /**A Unix timestamp (seconds) that orders were last updated at or later than */
-  updatedFrom: number;
+  updatedFrom?: Date;
   /**A Unix timestamp (seconds) that orders were last updated at or before than */
-  updatedTo: number;
+  updatedTo?: Date;
   /**Sort ascending or descending by when orders were last updated. Default is desc. */
-  updatedSort: string;
+  updatedSort?: string;
   /**A Unix timestamp (seconds) that orders were created in the POS at or later than */
-  posFrom: number;
+  posFrom?: Date;
   /**A Unix timestamp (seconds) that orders were created in the POS at or before than */
-  posTo: number;
+  posTo?: Date;
   /**Sort ascending or descending by when orders were created in the POS. Default is desc. */
-  posSort: string;
+  posSort?: string;
   /**Number of matching records to skip before returning the matches, default is 0 */
-  offset: number;
+  offset?: number;
   /**Max number of records to return. Default is 50 (Maximum: 100).
    * If the request is made on the Read-Only service and gzip compression is enabled
    * (e.g. Accept-Encoding: gzip) then the Default becomes 200,
    * with a maximum supported limit of 1,000 records. */
-  limit: number;
+  limit?: number;
 };
 
 export default class Order {
@@ -175,7 +175,23 @@ export default class Order {
         url: `/orders/${orderId}`,
       };
     } else {
-      requestData = { ...requestData, url: "/orders", params: filters };
+      let params: any = filters;
+      if (filters) {
+        // convert date to unix timstamp
+        if (filters.from)
+          params.from = Math.floor(filters.from.getTime() / 1000);
+        if (filters.to)
+          params.to = Math.floor(filters.to.getTime() / 1000);
+        if (filters.updatedFrom)
+          params.updatedFrom = Math.floor(filters.updatedFrom.getTime() / 1000);
+        if (filters.updatedTo)
+          params.updatedTo = Math.floor(filters.updatedTo.getTime() / 1000);
+        if (filters.posFrom)
+          params.posFrom = Math.floor(filters.posFrom.getTime() / 1000);
+        if (filters.posTo)
+          params.posTo = Math.floor(filters.posTo.getTime() / 1000);
+      }
+      requestData = { ...requestData, url: "/orders", params };
     }
     return await this.requestMaker(requestData);
   }
