@@ -118,7 +118,7 @@ export default class Doshii {
       timestamp: Math.round(Date.now() / 1000),
     };
     try {
-      const resp = await axios({
+      const resp = await axios.request({
         ...data,
         baseURL: this.url,
         headers: {
