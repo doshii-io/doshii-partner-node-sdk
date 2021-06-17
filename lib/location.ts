@@ -22,13 +22,14 @@ export default class Location {
     };
     if (locationId) {
       requestData = {
+        ...requestData,
         url: `/locations/${locationId}`,
         headers: {
           "doshii-location-id": locationId,
         },
       };
     } else {
-      requestData = { url: "/locations" };
+      requestData = { ...requestData, url: "/locations" };
     }
     return await this.requestMaker(requestData);
   }
@@ -45,6 +46,7 @@ export default class Location {
     };
     if (locationId) {
       requestData = {
+        ...requestData,
         url: `/health/locations/${locationId}`,
         headers: {
           "doshii-location-id": locationId,
@@ -52,6 +54,7 @@ export default class Location {
       };
     } else {
       requestData = {
+        ...requestData,
         url: "/health/locations",
       };
     }

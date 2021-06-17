@@ -39,7 +39,7 @@ export default class Loyalty {
     if (checkInId) {
       return this.requestMaker({
         ...req,
-        url: `loyalty/checkins/${checkInId}`,
+        url: `/loyalty/checkins/${checkInId}`,
       });
     } else {
       let params: any = options;
@@ -50,7 +50,7 @@ export default class Loyalty {
       }
       return this.requestMaker({
         ...req,
-        url: "loyalty/checkins",
+        url: "/loyalty/checkins",
         params,
       });
     }
@@ -64,7 +64,7 @@ export default class Loyalty {
    */
   async createCheckin(locationId: string, data: any) {
     return this.requestMaker({
-      url: "loyalty/checkins",
+      url: "/loyalty/checkins",
       method: "POST",
       headers: {
         "doshii-location-id": locationId,
@@ -99,7 +99,7 @@ export default class Loyalty {
    */
   async deleteCheckin(locationId: string, checkinId: string) {
     return this.requestMaker({
-      url: `loyalty/checkin/${checkinId}`,
+      url: `/loyalty/checkins/${checkinId}`,
       method: "DELETE",
       headers: {
         "doshii-location-id": locationId,
