@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 
-export default class Loyalty {
+export default class Checkin {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
 
   constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
@@ -121,7 +121,7 @@ export default class Loyalty {
    */
   update(locationId: string, checkinId: string, data: any) {
     return this.requestMaker({
-      url: `checkins/${checkinId}`,
+      url: `/checkins/${checkinId}`,
       method: "PUT",
       headers: {
         "doshii-location-id": locationId,
