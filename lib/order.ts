@@ -10,7 +10,7 @@ enum OrderStatus {
   VenueCancelled = "venue_cancelled",
 }
 
-type OrderRetrivalFilters = {
+export type OrderRetrievalFilters = {
   /**Comma separated list of statuses.
    * Defaults to accepting all. eg. pending,accepted. */
   status?: string;
@@ -161,7 +161,7 @@ export default class Order {
   async get(
     locationId: string,
     orderId?: string,
-    filters?: OrderRetrivalFilters
+    filters?: OrderRetrievalFilters
   ) {
     let requestData: AxiosRequestConfig = {
       headers: {
@@ -180,8 +180,7 @@ export default class Order {
         // convert date to unix timstamp
         if (filters.from)
           params.from = Math.floor(filters.from.getTime() / 1000);
-        if (filters.to)
-          params.to = Math.floor(filters.to.getTime() / 1000);
+        if (filters.to) params.to = Math.floor(filters.to.getTime() / 1000);
         if (filters.updatedFrom)
           params.updatedFrom = Math.floor(filters.updatedFrom.getTime() / 1000);
         if (filters.updatedTo)
