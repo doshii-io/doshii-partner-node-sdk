@@ -59,12 +59,12 @@ export default class Table {
     name: string,
     options?: {
       status?:
-      | "pending"
-      | "rejected"
-      | "accepted"
-      | "acknowledged"
-      | "cancelled"
-      | "cust_cancelled";
+        | "pending"
+        | "rejected"
+        | "accepted"
+        | "acknowledged"
+        | "cancelled"
+        | "cust_cancelled";
       seated?: boolean;
     }
   ) {
@@ -104,12 +104,12 @@ export default class Table {
     name: string,
     options?: {
       status?:
-      | "pending"
-      | "rejected"
-      | "accepted"
-      | "complete"
-      | "cancelled"
-      | "venue_cancelled";
+        | "pending"
+        | "rejected"
+        | "accepted"
+        | "complete"
+        | "cancelled"
+        | "venue_cancelled";
     }
   ) {
     return await this.requestMaker({

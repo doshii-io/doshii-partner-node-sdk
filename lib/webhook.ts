@@ -19,7 +19,7 @@ export enum WebhookEvents {
   TABLE_UPDATED = "table_updated",
   TABLE_DELETED = "table_deleted",
   TABLE_BULK_UPDATED = "table_bulk_updated",
-  BOOKING_CREATED = "bookin_created",
+  BOOKING_CREATED = "booking_created",
   BOOKING_UPDATED = "booking_updated",
   CHECKIN_CREATED = "checkin_created",
   CHECKIN_DELETED = "checkin_deleted",
@@ -48,12 +48,8 @@ export default class Webhook {
    * @returns a list of webhooks or just once webhook if event is provided
    */
   async get(event?: WebhookEvents) {
-    let url = "/webhooks";
-    if (event) {
-      url += `/${event}`;
-    }
     return await this.requestMaker({
-      url,
+      url: event ? `/webhooks/${event}` : "/webhooks",
       method: "GET",
     });
   }
@@ -81,9 +77,9 @@ export default class Webhook {
    * @param data The details for the webhook
    * @returns The updated webhook
    */
-  async updateWebhook(data: any) {
+  async updateWebhook(event: WebhookEvents, data: any) {
     return await this.requestMaker({
-      url: "/webhooks",
+      url: `/webhooks/${event}`,
       method: "PUT",
       data,
     });

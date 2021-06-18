@@ -35,12 +35,14 @@ describe("Location", () => {
       url: "/tables",
     });
 
-    const tableName = 'sonsf90385'
-    await expect(doshii.table.get(locationId, tableName, {
-      id: ['124l', 'dsf'],
-      covers: 'fdgsfg',
-      isActive: true
-    })).resolves.toBeDefined();
+    const tableName = "sonsf90385";
+    await expect(
+      doshii.table.get(locationId, tableName, {
+        id: ["124l", "dsf"],
+        covers: "fdgsfg",
+        isActive: true,
+      })
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -51,15 +53,17 @@ describe("Location", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/tables/${tableName}`,
     });
-    expect(authSpy).toBeCalledTimes(2)
+    expect(authSpy).toBeCalledTimes(2);
   });
 
   test("Should request for tables with options", async () => {
-    await expect(doshii.table.get(locationId, "", {
-      id: ['124l', 'dsf'],
-      covers: 'fdgsfg',
-      isActive: true
-    })).resolves.toBeDefined();
+    await expect(
+      doshii.table.get(locationId, "", {
+        id: ["124l", "dsf"],
+        covers: "fdgsfg",
+        isActive: true,
+      })
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -70,16 +74,18 @@ describe("Location", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/tables",
       params: {
-        id: ['124l', 'dsf'],
-        covers: 'fdgsfg',
-        isActive: true
-      }
+        id: ["124l", "dsf"],
+        covers: "fdgsfg",
+        isActive: true,
+      },
     });
   });
 
   test("Should request for table bookings with or without filters", async () => {
-    const tableName = 'table1'
-    await expect(doshii.table.getBookings(locationId, tableName)).resolves.toBeDefined();
+    const tableName = "table1";
+    await expect(
+      doshii.table.getBookings(locationId, tableName)
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -91,10 +97,12 @@ describe("Location", () => {
       url: `/tables/${tableName}/bookings`,
     });
 
-    await expect(doshii.table.getBookings(locationId, tableName, {
-      status: "pending",
-      seated: false
-    })).resolves.toBeDefined();
+    await expect(
+      doshii.table.getBookings(locationId, tableName, {
+        status: "pending",
+        seated: false,
+      })
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -106,14 +114,16 @@ describe("Location", () => {
       url: `/tables/${tableName}/bookings`,
       params: {
         status: "pending",
-        seated: false
-      }
+        seated: false,
+      },
     });
   });
 
   test("Should request for table checkins", async () => {
-    const tableName = 'table1'
-    await expect(doshii.table.getCheckins(locationId, tableName)).resolves.toBeDefined();
+    const tableName = "table1";
+    await expect(
+      doshii.table.getCheckins(locationId, tableName)
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -127,8 +137,10 @@ describe("Location", () => {
   });
 
   test("Should request for table orders with or without filters", async () => {
-    const tableName = 'table1'
-    await expect(doshii.table.getOrders(locationId, tableName)).resolves.toBeDefined();
+    const tableName = "table1";
+    await expect(
+      doshii.table.getOrders(locationId, tableName)
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -140,9 +152,11 @@ describe("Location", () => {
       url: `/tables/${tableName}/orders`,
     });
 
-    await expect(doshii.table.getOrders(locationId, tableName, {
-      status: "pending",
-    })).resolves.toBeDefined();
+    await expect(
+      doshii.table.getOrders(locationId, tableName, {
+        status: "pending",
+      })
+    ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -154,7 +168,7 @@ describe("Location", () => {
       url: `/tables/${tableName}/orders`,
       params: {
         status: "pending",
-      }
+      },
     });
   });
 });

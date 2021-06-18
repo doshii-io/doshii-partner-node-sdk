@@ -15,7 +15,7 @@ export default class Transaction {
    */
   async getOrderTransactions(locationId: string, orderId?: string) {
     return await this.requestMaker({
-      url: orderId ? `/transactions/${orderId}` : '/transactions',
+      url: orderId ? `/transactions/${orderId}` : "/transactions",
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
