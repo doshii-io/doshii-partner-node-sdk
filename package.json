@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "/dist"
+    "dist"
   ],
   "repository": "https://github.com/doshii-io/doshii-partner-node-sdk.git",
   "scripts": {

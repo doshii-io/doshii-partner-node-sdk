@@ -92,15 +92,23 @@ export default class Location {
   /**
    * Subscribe to a Location to obtain access to the location's events and data
    * @param locationId hashed ID of the location.
+   * @param data The references and features enabled for this specific location subscription
    * @returns Subscription operation status
    */
-  async subscribeTo(locationId: string) {
+  async subscribeTo(
+    locationId: string,
+    data?: {
+      mappedLocationId?: string;
+      useFilteredMenu?: boolean;
+    }
+  ) {
     return await this.requestMaker({
       url: `/locations/${locationId}/subscription`,
       headers: {
         hashedLocationId: locationId,
       },
       method: "POST",
+      data,
     });
   }
 

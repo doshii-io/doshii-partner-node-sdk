@@ -188,7 +188,7 @@ export default class Doshii {
   private onWebsocketMessage(event: any) {
     this.logger.debug("Doshii: Recieved message from websocket");
     const eventData = JSON.parse(event.data);
-    if ("doshii" in eventData && "pong" in eventData.doshii) {
+    if (eventData?.doshii?.pong) {
       this.logger.debug("Doshii: Got pong");
       this.notifySubscribers(WebSocketEvents.PONG, eventData);
       return;

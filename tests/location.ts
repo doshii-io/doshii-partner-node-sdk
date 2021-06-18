@@ -127,6 +127,25 @@ describe("Location", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/locations/${locationId}/subscription`,
     });
+
+    const data = {
+      mappedLocationId: "12345",
+      useFilteredMenu: true,
+    };
+    await expect(
+      doshii.location.subscribeTo(locationId, data)
+    ).resolves.toBeDefined();
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        hashedLocationId: locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "POST",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: `/locations/${locationId}/subscription`,
+      data,
+    });
   });
 
   test("Should request for location unsubscription", async () => {
