@@ -1,5 +1,4 @@
-import Doshii from "../lib/doshii";
-import { OrderStatus } from "../lib/order";
+import Doshii, { OrderStatus } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 

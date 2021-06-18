@@ -1,5 +1,4 @@
-import Doshii from "../lib/doshii";
-import { WebhookEvents } from "../lib/webhook";
+import Doshii, { WebhookEvents } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 

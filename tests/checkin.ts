@@ -1,4 +1,4 @@
-import Doshii from "../lib/doshii";
+import Doshii from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 

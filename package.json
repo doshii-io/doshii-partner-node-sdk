@@ -2,8 +2,8 @@
   "name": "doshii-sdk",
   "version": "2.0.0",
   "description": "Module for Doshii partner APIs",
-  "main": "dist/doshii",
-  "types": "dist/doshii.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "/dist"
   ],
