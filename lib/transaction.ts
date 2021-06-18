@@ -15,7 +15,7 @@ export default class Transaction {
    */
   async getOrderTransactions(locationId: string, orderId?: string) {
     return await this.requestMaker({
-      url: `/transactions/${orderId}`,
+      url: orderId ? `/transactions/${orderId}` : '/transactions',
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
@@ -30,7 +30,7 @@ export default class Transaction {
    * @param transactionId ID of the transaction to be retrieved
    * @returns The transaction
    */
-  async getTransactions(locationId: string, transactionId: string) {
+  async getTransaction(locationId: string, transactionId: string) {
     return await this.requestMaker({
       url: `/transactions/${transactionId}`,
       method: "GET",
@@ -105,7 +105,7 @@ export default class Transaction {
   ) {
     return await this.requestMaker({
       url: `/transactions/${transactionId}`,
-      method: "POST",
+      method: "PUT",
       headers: {
         "doshii-location-id": locationId,
       },
