@@ -21,56 +21,30 @@ export default class Table {
     locationId: string,
     name?: string,
     options?: {
-      name?: string;
       id?: Array<string>;
       isActive?: boolean;
       covers?: string;
     }
   ) {
-    let url = "/tables";
-    let params = undefined;
-    if (options && options.name) {
-      url += `/${options.name}`;
-    } else {
-      params = options;
-    }
-    return await this.requestMaker({
-      url,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      params,
-    });
-    // -----
-
     let req: AxiosRequestConfig = {
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
       },
     };
-    if (checkinId) {
+    if (name) {
       return this.requestMaker({
         ...req,
-        url: `/checkins/${checkinId}`,
+        url: `/tables/${name}`,
       });
     } else {
-      let params: any = options;
-      if (options) {
-        if (options.from)
-          params.from = Math.floor(options.from.getTime() / 1000);
-        if (options.to) params.to = Math.floor(options.to.getTime() / 1000);
-        if (options.updatedFrom)
-          params.updatedFrom = Math.floor(options.updatedFrom.getTime() / 1000);
-        if (options.updatedTo)
-          params.updatedTo = Math.floor(options.updatedTo.getTime() / 1000);
-      }
+      let params = options;
       return this.requestMaker({
         ...req,
-        url: "/checkins",
+        url: "/tables",
         params,
       });
+    }
   }
 
   /**
@@ -85,13 +59,13 @@ export default class Table {
     name: string,
     options?: {
       status?:
-        | "pending"
-        | "rejected"
-        | "accepted"
-        | "acknowledged"
-        | "cancelled"
-        | "cust_cancelled";
-      seated: boolean;
+      | "pending"
+      | "rejected"
+      | "accepted"
+      | "acknowledged"
+      | "cancelled"
+      | "cust_cancelled";
+      seated?: boolean;
     }
   ) {
     return await this.requestMaker({
@@ -130,12 +104,12 @@ export default class Table {
     name: string,
     options?: {
       status?:
-        | "pending"
-        | "rejected"
-        | "accepted"
-        | "complete"
-        | "cancelled"
-        | "venue_cancelled";
+      | "pending"
+      | "rejected"
+      | "accepted"
+      | "complete"
+      | "cancelled"
+      | "venue_cancelled";
     }
   ) {
     return await this.requestMaker({
