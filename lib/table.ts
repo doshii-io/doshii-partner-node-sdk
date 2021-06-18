@@ -19,6 +19,7 @@ export default class Table {
    */
   async get(
     locationId: string,
+    name?: string,
     options?: {
       name?: string;
       id?: Array<string>;
@@ -41,6 +42,35 @@ export default class Table {
       },
       params,
     });
+    // -----
+
+    let req: AxiosRequestConfig = {
+      method: "GET",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+    };
+    if (checkinId) {
+      return this.requestMaker({
+        ...req,
+        url: `/checkins/${checkinId}`,
+      });
+    } else {
+      let params: any = options;
+      if (options) {
+        if (options.from)
+          params.from = Math.floor(options.from.getTime() / 1000);
+        if (options.to) params.to = Math.floor(options.to.getTime() / 1000);
+        if (options.updatedFrom)
+          params.updatedFrom = Math.floor(options.updatedFrom.getTime() / 1000);
+        if (options.updatedTo)
+          params.updatedTo = Math.floor(options.updatedTo.getTime() / 1000);
+      }
+      return this.requestMaker({
+        ...req,
+        url: "/checkins",
+        params,
+      });
   }
 
   /**
