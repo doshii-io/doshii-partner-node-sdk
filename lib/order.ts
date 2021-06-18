@@ -1,19 +1,18 @@
 import { AxiosRequestConfig } from "axios";
-import { LogLevel, Logger } from "./utils";
 
-enum OrderStatus {
-  Pending = "pending",
-  Accepted = "accepted",
-  Rejected = "rejected",
-  Cancelled = "cancelled",
-  Complete = "complete",
-  VenueCancelled = "venue_cancelled",
+export enum OrderStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  CANCELLED = "cancelled",
+  COMPLETE = "complete",
+  VENUE_CANCELLED = "venue_cancelled",
 }
 
 export type OrderRetrievalFilters = {
   /**Comma separated list of statuses.
    * Defaults to accepting all. eg. pending,accepted. */
-  status?: string;
+  status?: Array<OrderStatus>;
   /**The POS reference for the order. */
   posRef?: string;
   /**The optional external order
@@ -24,19 +23,19 @@ export type OrderRetrievalFilters = {
   /**A Unix timestamp (seconds) that orders were created at or before than */
   to?: Date;
   /**Sort ascending or descending by order creation date. Default is desc. */
-  sort?: string;
+  sort?: "asc" | "desc";
   /**A Unix timestamp (seconds) that orders were last updated at or later than */
   updatedFrom?: Date;
   /**A Unix timestamp (seconds) that orders were last updated at or before than */
   updatedTo?: Date;
   /**Sort ascending or descending by when orders were last updated. Default is desc. */
-  updatedSort?: string;
+  updatedSort?: "asc" | "desc";
   /**A Unix timestamp (seconds) that orders were created in the POS at or later than */
   posFrom?: Date;
   /**A Unix timestamp (seconds) that orders were created in the POS at or before than */
   posTo?: Date;
   /**Sort ascending or descending by when orders were created in the POS. Default is desc. */
-  posSort?: string;
+  posSort?: "asc" | "desc";
   /**Number of matching records to skip before returning the matches, default is 0 */
   offset?: number;
   /**Max number of records to return. Default is 50 (Maximum: 100).
@@ -47,32 +46,20 @@ export type OrderRetrievalFilters = {
 };
 
 export default class Order {
-  private orders = new Map<
-    string,
-    {
-      resolve: (value: any) => void;
-      reject: (reason?: any) => void;
-      status: OrderStatus;
-      details: any;
-    }
-  >();
   private readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
-  private readonly logger: Logger;
 
-  constructor(
-    requestMaker: (data: AxiosRequestConfig) => Promise<any>,
-    logLevel = LogLevel.ERROR
-  ) {
+  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
-    this.logger = new Logger(logLevel);
   }
 
-  /*
-  Create a new Order at a Location
-  */
+  /**
+   * Create a new Order at a Location
+   * @param locationId hashed location ID of the location
+   * @param data Order data
+   * @returns the order created
+   */
   async createOrder(locationId: string, data: any) {
-    // send create order request to doshii
-    const response = await this.requestMaker({
+    return await this.requestMaker({
       headers: {
         "doshii-location-id": locationId,
       },
@@ -80,72 +67,6 @@ export default class Order {
       method: "POST",
       data,
     });
-
-    this.logger.log(response);
-    /*
-    save to orders so that the status can be 
-    updated when recieved from websocket
-    which will resolve the returned promise
-    */
-    let resolveFunc: (value: any) => void;
-    let rejectFunc: (reason?: any) => void;
-    const result = new Promise((res, rej) => {
-      resolveFunc = res;
-      rejectFunc = rej;
-    });
-    this.orders.set(response.id, {
-      resolve: resolveFunc!,
-      reject: rejectFunc!,
-      // status: Order.OrderStatus[response.data.status as string]
-      status: response.status,
-      details: response,
-    });
-    this.logger.log(result);
-    this.logger.log(this.orders);
-    return result;
-  }
-
-  orderUpdate(data: any) {
-    // check if order id is present in orders
-    const promiseControls = this.orders.has(data.id)
-      ? this.orders.get(data.id)
-      : undefined;
-
-    if (promiseControls) {
-      this.logger.debug("Doshii: Got orderUpdate");
-      this.logger.debug(data);
-      this.logger.log(promiseControls);
-      if (data.status == OrderStatus.Complete) {
-        // resolve the promise if order is complete and
-        // remove from oders cache
-        this.logger.log("Order complete -------------");
-        this.logger.log(data);
-        promiseControls.resolve(data);
-        this.orders.delete(data.id);
-      } else if (
-        [
-          OrderStatus.Cancelled,
-          OrderStatus.Rejected,
-          OrderStatus.VenueCancelled,
-        ].includes(data.status)
-      ) {
-        // Reject promise if order didnt go through
-        // remove from oders cache
-        this.logger.log("Order rejected -------------");
-        this.logger.log(data);
-        promiseControls.reject(data);
-        this.orders.delete(data.id);
-      } else {
-        // Update order status in cache
-        this.logger.log("Order update -------------");
-        this.logger.log(data);
-        promiseControls.status = data.status;
-        this.logger.log(promiseControls);
-      }
-    } else {
-      this.logger.log("Unknown Order update -------------");
-      this.logger.log(data);
-    }
   }
 
   /**
