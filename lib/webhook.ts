@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 
-export enum WebhookEvents {
+export enum DoshiiEvents {
   ORDER_CREATED = "order_created",
   ORDER_PREPROCESSED = "order_preprocess",
   ORDER_UPDATED = "order_updated",
@@ -31,6 +31,22 @@ export enum WebhookEvents {
   CARD_ENQUIRY_REQUESTED = "card_enquiry",
 }
 
+export interface RegisterWebhook {
+  event: DoshiiEvents;
+  webhookUrl: string;
+  authenticationKey: string;
+  authenticationToken: string;
+}
+
+export interface WebhookResponse {
+  event: DoshiiEvents;
+  webhookUrl: string;
+  webhookLatency?: number;
+  authenticationEnabled: boolean;
+  updatedAt: string;
+  createdAt: string;
+  uri: string;
+}
 /**
  * Webhooks API
  */
@@ -47,11 +63,30 @@ export default class Webhook {
    * If not provided all the registered webhooks are retrieved
    * @returns a list of webhooks or just once webhook if event is provided
    */
-  async get(event?: WebhookEvents) {
+  async get(
+    event?: DoshiiEvents
+  ): Promise<Array<WebhookResponse> | WebhookResponse> {
     return await this.requestMaker({
       url: event ? `/webhooks/${event}` : "/webhooks",
       method: "GET",
     });
+  }
+
+  /**
+   * Retrieve a specific webhook registered for your application
+   * @returns a list of webhooks
+   */
+  async getAll(): Promise<Array<WebhookResponse>> {
+    return this.get() as Promise<Array<WebhookResponse>>;
+  }
+
+  /**
+   * Retrieve a specific webhook registered for your application
+   * @param event The name of the Doshii event that the webhook subscription is being retrieved for.
+   * @returns webhook for the provided event
+   */
+  async getOne(event: DoshiiEvents): Promise<WebhookResponse> {
+    return this.get(event) as Promise<WebhookResponse>;
   }
 
   /**
@@ -61,14 +96,11 @@ export default class Webhook {
    * @returns the registered webhook
    *
    */
-  async registerWebhook(event: WebhookEvents, data: any) {
+  async registerWebhook(data: RegisterWebhook): Promise<WebhookResponse> {
     return await this.requestMaker({
       url: "/webhooks",
       method: "POST",
-      data: {
-        ...data,
-        event,
-      },
+      data,
     });
   }
 
@@ -77,20 +109,24 @@ export default class Webhook {
    * @param data The details for the webhook
    * @returns The updated webhook
    */
-  async updateWebhook(event: WebhookEvents, data: any) {
+  async updateWebhook(data: RegisterWebhook): Promise<WebhookResponse> {
     return await this.requestMaker({
-      url: `/webhooks/${event}`,
+      url: `/webhooks/${data.event}`,
       method: "PUT",
-      data,
+      data: {
+        webhookUrl: data.webhookUrl,
+        authenticationKey: data.authenticationKey,
+        authenticationToken: data.authenticationToken,
+      },
     });
   }
 
   /**
    * Remove a webhook subscription from your application
    * @param event The name of the Doshii event that the webhook subscription is being removed from.
-   * @returns status code of the operation
+   * @returns status of the operation
    */
-  async unregisterWebhook(event: WebhookEvents) {
+  async unregisterWebhook(event: DoshiiEvents): Promise<{ message: string }> {
     return await this.requestMaker({
       url: `/webhooks/${event}`,
       method: "DELETE",

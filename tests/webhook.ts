@@ -1,28 +1,37 @@
-import Doshii, { WebhookEvents } from "../lib";
+import Doshii, { DoshiiEvents } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
 jest.mock("axios");
 jest.mock("jsonwebtoken");
 
+const sampleResponse = {
+  event: "order_created",
+  webhookUrl: "https://some.external.site/doshii/webhook",
+  authenticationEnabled: false,
+  webhookLatency: 5000,
+  updatedAt: "2019-01-01T12:00:00.000Z",
+  createdAt: "2019-01-01T12:00:00.000Z",
+  uri: "http://sandbox.doshii.co/partner/v3/webhooks/order_created",
+};
+
 describe("Webhook", () => {
   let doshii: Doshii;
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
   let authSpy: jest.SpyInstance;
-  let requestSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, "", true);
     authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
-    requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: "success" });
   });
 
-  test("Should request for registered webhooks", async () => {
-    await expect(doshii.webhook.get()).resolves.toBeDefined();
+  test("Should request for all registered webhooks", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleResponse] });
+    await expect(doshii.webhook.get()).resolves.toMatchObject([sampleResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -32,10 +41,16 @@ describe("Webhook", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/webhooks",
     });
+    expect(authSpy).toBeCalledTimes(1);
+  });
 
+  test("Should request for a specific webhook", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleResponse });
     await expect(
-      doshii.webhook.get(WebhookEvents.BOOKING_CREATED)
-    ).resolves.toBeDefined();
+      doshii.webhook.get(DoshiiEvents.BOOKING_CREATED)
+    ).resolves.toMatchObject(sampleResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -43,16 +58,24 @@ describe("Webhook", () => {
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/webhooks/${WebhookEvents.BOOKING_CREATED}`,
+      url: `/webhooks/${DoshiiEvents.BOOKING_CREATED}`,
     });
-    expect(authSpy).toBeCalledTimes(2);
+    expect(authSpy).toBeCalledTimes(1);
   });
 
   test("Should request for a new webhook registration", async () => {
-    const data = { webhook: "new webhook" };
-    await expect(
-      doshii.webhook.registerWebhook(WebhookEvents.CHECKIN_CREATED, data)
-    ).resolves.toBeDefined();
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleResponse });
+    const data = {
+      event: DoshiiEvents.CHECKIN_CREATED,
+      webhookUrl: "https://some.external.site/doshii/webhook",
+      authenticationKey: "secure_key",
+      authenticationToken: "secure_token",
+    };
+    await expect(doshii.webhook.registerWebhook(data)).resolves.toMatchObject(
+      sampleResponse
+    );
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -61,18 +84,23 @@ describe("Webhook", () => {
       method: "POST",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/webhooks",
-      data: {
-        ...data,
-        event: WebhookEvents.CHECKIN_CREATED,
-      },
+      data,
     });
   });
 
   test("Should request for a webhook update", async () => {
-    const data = { webhook: "webhook update" };
-    await expect(
-      doshii.webhook.updateWebhook(WebhookEvents.CHECKIN_CREATED, data)
-    ).resolves.toBeDefined();
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleResponse });
+    const data = {
+      event: DoshiiEvents.TABLE_DELETED,
+      webhookUrl: "https://some.external.site/doshii/webhook",
+      authenticationKey: "secure_key",
+      authenticationToken: "secure_token",
+    };
+    await expect(doshii.webhook.updateWebhook(data)).resolves.toMatchObject(
+      sampleResponse
+    );
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -80,15 +108,25 @@ describe("Webhook", () => {
       },
       method: "PUT",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/webhooks/${WebhookEvents.CHECKIN_CREATED}`,
-      data,
+      url: `/webhooks/${data.event}`,
+      data: {
+        webhookUrl: "https://some.external.site/doshii/webhook",
+        authenticationKey: "secure_key",
+        authenticationToken: "secure_token",
+      },
     });
   });
 
   test("Should request for a webhook removal", async () => {
+    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
+      status: 200,
+      data: { message: "The webhook subscription that was deleted" },
+    });
     await expect(
-      doshii.webhook.removeWebhook(WebhookEvents.CHECKIN_CREATED)
-    ).resolves.toBeDefined();
+      doshii.webhook.removeWebhook(DoshiiEvents.CHECKIN_CREATED)
+    ).resolves.toMatchObject({
+      message: "The webhook subscription that was deleted",
+    });
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -96,7 +134,7 @@ describe("Webhook", () => {
       },
       method: "DELETE",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/webhooks/${WebhookEvents.CHECKIN_CREATED}`,
+      url: `/webhooks/${DoshiiEvents.CHECKIN_CREATED}`,
     });
   });
 });

@@ -3,11 +3,15 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import WebSocket from "ws";
 
-import Location from "./location";
+import Location, { LocationResponse } from "./location";
 import Order, { OrderRetrievalFilters, OrderStatus } from "./order";
-import Device from "./device";
+import Device, { DeviceResponse, DeviceRegister, DeviceUpdate } from "./device";
 import Transaction from "./transaction";
-import Webhook, { WebhookEvents } from "./webhook";
+import Webhook, {
+  DoshiiEvents,
+  WebhookResponse,
+  RegisterWebhook,
+} from "./webhook";
 import Booking from "./booking";
 import Table from "./table";
 import Menu from "./menu";
@@ -415,4 +419,15 @@ export default class Doshii {
   }
 }
 
-export { OrderStatus, OrderRetrievalFilters, LogLevel, WebhookEvents };
+export {
+  OrderStatus,
+  OrderRetrievalFilters,
+  LogLevel,
+  DoshiiEvents,
+  DeviceRegister,
+  DeviceUpdate,
+  DeviceResponse,
+  LocationResponse,
+  WebhookResponse,
+  RegisterWebhook,
+};
