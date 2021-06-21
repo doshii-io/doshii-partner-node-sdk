@@ -10,7 +10,7 @@ import Transaction from "./transaction";
 import Webhook, {
   DoshiiEvents,
   WebhookResponse,
-  RegisterWebhook,
+  WebhookRegister,
 } from "./webhook";
 import Booking from "./booking";
 import Table from "./table";
@@ -429,5 +429,5 @@ export {
   DeviceResponse,
   LocationResponse,
   WebhookResponse,
-  RegisterWebhook,
+  WebhookRegister,
 };

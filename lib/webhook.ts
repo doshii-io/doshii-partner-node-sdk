@@ -31,7 +31,7 @@ export enum DoshiiEvents {
   CARD_ENQUIRY_REQUESTED = "card_enquiry",
 }
 
-export interface RegisterWebhook {
+export interface WebhookRegister {
   event: DoshiiEvents;
   webhookUrl: string;
   authenticationKey: string;
@@ -96,7 +96,7 @@ export default class Webhook {
    * @returns the registered webhook
    *
    */
-  async registerWebhook(data: RegisterWebhook): Promise<WebhookResponse> {
+  async registerWebhook(data: WebhookRegister): Promise<WebhookResponse> {
     return await this.requestMaker({
       url: "/webhooks",
       method: "POST",
@@ -109,7 +109,7 @@ export default class Webhook {
    * @param data The details for the webhook
    * @returns The updated webhook
    */
-  async updateWebhook(data: RegisterWebhook): Promise<WebhookResponse> {
+  async updateWebhook(data: WebhookRegister): Promise<WebhookResponse> {
     return await this.requestMaker({
       url: `/webhooks/${data.event}`,
       method: "PUT",

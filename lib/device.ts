@@ -54,31 +54,10 @@ export default class Device {
     if (deviceId) {
       url += `/${deviceId}`;
     }
-    let res = await this.requestMaker({
+    return await this.requestMaker({
       url,
       method: "GET",
     });
-
-    if (Array.isArray(res)) {
-      if (!res.length) return res;
-      let resp: Array<DeviceResponse> = [];
-      for (const _res of res) {
-        let _resp = _res;
-        if (_res.events) _resp.events = _res.event.split(",");
-        if (_res.channels) _resp.channels = _res.channels.split(",");
-        if (_res.locationIds) _resp.locationIds = _res.locationIds.split(",");
-        if (_res.terminals) _resp.terminals = _res.terminals.split(",");
-        resp.push(_resp);
-      }
-      return resp;
-    } else {
-      let resp: DeviceResponse = res;
-      if (res.events) resp.events = res.event.split(",");
-      if (res.channels) resp.channels = res.channels.split(",");
-      if (res.locationIds) resp.locationIds = res.locationIds.split(",");
-      if (res.terminals) resp.terminals = res.terminals.split(",");
-      return resp;
-    }
   }
 
   /**

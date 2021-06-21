@@ -9,10 +9,10 @@ const sampleResponse = {
   doshiiId: "rj7DnGBL",
   name: "Device 1",
   ref: "24533-2345d-234f32-sdf21",
-  events: "order_created",
-  terminals: "bEK3ryO7",
-  channels: "Order ahead",
-  locationIds: "4gJpXq9B",
+  events: ["order_created"],
+  terminals: ["bEK3ryO7"],
+  channels: ["Order ahead"],
+  locationIds: ["4gJpXq9B"],
   version: "pD7Jv2Vk93sq3levVxrWuKaEjxzApphzRWGGajeq",
   updatedAt: "2019-01-01T12:00:00.000Z",
   createdAt: "2019-01-01T12:00:00.000Z",
@@ -21,20 +21,20 @@ const sampleResponse = {
 const sampleRegisterDeviceResponse = {
   name: "Device 1",
   ref: "24533-2345d-234f32-sdf21",
-  events: "order_created",
-  terminals: "bEK3ryO7",
-  channels: "Order ahead",
-  locationIds: "4gJpXq9B",
+  events: ["order_created"],
+  terminals: ["bEK3ryO7"],
+  channels: ["Order ahead"],
+  locationIds: ["4gJpXq9B"],
 };
 
 const sampleUpdateDeviceResponse = {
   doshiiId: "rj7DnGBL",
   name: "Device 1",
   ref: "24533-2345d-234f32-sdf21",
-  events: "order_created",
-  terminals: "bEK3ryO7",
-  channels: "Order ahead",
-  locationIds: "4gJpXq9B",
+  events: ["order_created"],
+  terminals: ["bEK3ryO7"],
+  channels: ["Order ahead"],
+  locationIds: ["4gJpXq9B"],
   version: "pD7Jv2Vk93sq3levVxrWuKaEjxzApphzRWGGajeq",
 };
 
