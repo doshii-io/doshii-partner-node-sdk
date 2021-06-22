@@ -1,5 +1,144 @@
 import { AxiosRequestConfig } from "axios";
 
+export interface TransactionRequest {
+  amount: number;
+  reference: string;
+  invoice: string;
+  linkedTrxId: string;
+  method:
+    | "cash"
+    | "visa"
+    | "mastercard"
+    | "eftpos"
+    | "amex"
+    | "diners"
+    | "giftcard"
+    | "loyalty"
+    | "credit"
+    | "crypto"
+    | "directdeposit"
+    | "cheque"
+    | "alipay"
+    | "wechatpay"
+    | "zip"
+    | "moto"
+    | "other";
+  tip: number;
+  trn: string;
+  prepaid: boolean;
+  surcounts: [
+    {
+      posId: string;
+      name: string;
+      description: string;
+      amount: number;
+      type: "absolute" | "percentage";
+      value: string;
+    }
+  ];
+}
+
+export interface TransactionUpdate {
+  amount: number;
+  reference: string;
+  invoice: string;
+  method:
+    | "cash"
+    | "visa"
+    | "mastercard"
+    | "eftpos"
+    | "amex"
+    | "diners"
+    | "giftcard"
+    | "loyalty"
+    | "credit"
+    | "crypto"
+    | "directdeposit"
+    | "cheque"
+    | "alipay"
+    | "wechatpay"
+    | "zip"
+    | "moto"
+    | "other";
+  tip: number;
+  trn: string;
+  prepaid: boolean;
+  surcounts: [
+    {
+      posId: string;
+      name: string;
+      description: string;
+      amount: number;
+      type: "absolute" | "percentage";
+      value: string;
+    }
+  ];
+  version: string;
+  status:
+    | "requested"
+    | "pending"
+    | "waiting"
+    | "cancelled"
+    | "rejected"
+    | "complete";
+  rejectionCode: "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "POSISE";
+  rejectionReason: string;
+  verifyData?: {
+    requires: Array<
+      | "accountId"
+      | "issueDate"
+      | "expiryDate"
+      | "authorisationCode"
+      | "imageUri"
+    >;
+    accountId: string;
+    issueDate: string;
+    expiryDate: string;
+    authorisationCode: string;
+    imageUri: string;
+  };
+}
+
+export interface TransactionResponse extends TransactionRequest {
+  id: string;
+  orderId: string;
+  acceptLess: boolean;
+  partnerInitiated: boolean;
+  prepaid: boolean;
+  rejectionCode: "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "POSISE";
+  rejectionReason: string;
+  version: string;
+  updatedAt: string;
+  createdAt: string;
+  uri: string;
+  status:
+    | "requested"
+    | "pending"
+    | "waiting"
+    | "cancelled"
+    | "rejected"
+    | "complete";
+  createdByApp: string;
+  processedByApp: string;
+  posTerminalId: string;
+  requestedAppId: string;
+}
+
+export interface TransactionLogsResponse {
+  logId: string;
+  employeeId: string;
+  employeeName: string;
+  employeePosRef: string;
+  deviceRef: string;
+  deviceName: string;
+  area: string;
+  appId: string;
+  appName: string;
+  audit: string;
+  action: Array<string>;
+  performedAt: string;
+}
+
 export default class Transaction {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
 
@@ -13,9 +152,12 @@ export default class Transaction {
    * @param orderId ID of the order whose transactions are to be retrieved
    * @returns Transactions associated to the order
    */
-  async getOrderTransactions(locationId: string, orderId?: string) {
+  async getOrderTransactions(
+    locationId: string,
+    orderId: string
+  ): Promise<Array<TransactionResponse>> {
     return await this.requestMaker({
-      url: orderId ? `/transactions/${orderId}` : "/transactions",
+      url: `/orders/${orderId}/transactions`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,
@@ -30,7 +172,10 @@ export default class Transaction {
    * @param transactionId ID of the transaction to be retrieved
    * @returns The transaction
    */
-  async getTransaction(locationId: string, transactionId: string) {
+  async getTransaction(
+    locationId: string,
+    transactionId: string
+  ): Promise<TransactionResponse> {
     return await this.requestMaker({
       url: `/transactions/${transactionId}`,
       method: "GET",
@@ -46,7 +191,10 @@ export default class Transaction {
    * @param transactionId ID of the transaction to be retrieved
    * @returns audit logs for the transaction
    */
-  async getLogs(locationId: string, transactionId: string) {
+  async getLogs(
+    locationId: string,
+    transactionId: string
+  ): Promise<TransactionLogsResponse> {
     return await this.requestMaker({
       url: `/transactions/${transactionId}/logs`,
       method: "GET",
@@ -63,7 +211,11 @@ export default class Transaction {
    * @param data transaction data
    * @returns The transaction that was created
    */
-  async createOrderTransaction(locationId: string, orderId: string, data: any) {
+  async createTransaction(
+    locationId: string,
+    orderId: string,
+    data: TransactionRequest
+  ): Promise<TransactionResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/transactions`,
       method: "POST",
@@ -74,22 +226,22 @@ export default class Transaction {
     });
   }
 
-  /**
-   * Alternate method for creating a new Transaction by specifying the Order ID in the request body
-   * @param locationId The hashed Location ID of the location you are interacting with
-   * @param data transaction data
-   * @returns
-   */
-  async createTransaction(locationId: string, data: any) {
-    return await this.requestMaker({
-      url: `/transactions`,
-      method: "POST",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      data,
-    });
-  }
+  // /**
+  //  * Alternate method for creating a new Transaction by specifying the Order ID in the request body
+  //  * @param locationId The hashed Location ID of the location you are interacting with
+  //  * @param data transaction data
+  //  * @returns
+  //  */
+  // async createTransaction(locationId: string, data: any) {
+  //   return await this.requestMaker({
+  //     url: `/transactions`,
+  //     method: "POST",
+  //     headers: {
+  //       "doshii-location-id": locationId,
+  //     },
+  //     data,
+  //   });
+  // }
 
   /**
    * Update the status of a Transaction
@@ -101,8 +253,8 @@ export default class Transaction {
   async updateTransaction(
     locationId: string,
     transactionId: string,
-    data: any
-  ) {
+    data: TransactionUpdate
+  ): Promise<TransactionResponse> {
     return await this.requestMaker({
       url: `/transactions/${transactionId}`,
       method: "PUT",

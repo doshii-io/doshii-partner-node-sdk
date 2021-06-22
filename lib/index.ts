@@ -6,7 +6,12 @@ import WebSocket from "ws";
 import Location, { LocationResponse } from "./location";
 import Order, { OrderRetrievalFilters, OrderStatus } from "./order";
 import Device, { DeviceResponse, DeviceRegister, DeviceUpdate } from "./device";
-import Transaction from "./transaction";
+import Transaction, {
+  TransactionResponse,
+  TransactionUpdate,
+  TransactionRequest,
+  TransactionLogsResponse,
+} from "./transaction";
 import Webhook, {
   DoshiiEvents,
   WebhookResponse,
@@ -430,4 +435,8 @@ export {
   LocationResponse,
   WebhookResponse,
   WebhookRegister,
+  TransactionResponse,
+  TransactionUpdate,
+  TransactionRequest,
+  TransactionLogsResponse,
 };
