@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from "axios";
+import { Surcounts } from "./sharedSchema";
 
 export interface TransactionRequest {
   amount: number;
@@ -26,16 +27,7 @@ export interface TransactionRequest {
   tip: number;
   trn: string;
   prepaid: boolean;
-  surcounts: [
-    {
-      posId: string;
-      name: string;
-      description: string;
-      amount: number;
-      type: "absolute" | "percentage";
-      value: string;
-    }
-  ];
+  surcounts: Array<Surcounts>;
 }
 
 export interface TransactionUpdate {
@@ -63,16 +55,7 @@ export interface TransactionUpdate {
   tip: number;
   trn: string;
   prepaid: boolean;
-  surcounts: [
-    {
-      posId: string;
-      name: string;
-      description: string;
-      amount: number;
-      type: "absolute" | "percentage";
-      value: string;
-    }
-  ];
+  surcounts: Array<Surcounts>;
   version: string;
   status:
     | "requested"

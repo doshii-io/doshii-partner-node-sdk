@@ -17,7 +17,7 @@ import Webhook, {
   WebhookResponse,
   WebhookRegister,
 } from "./webhook";
-import Booking from "./booking";
+import Booking, { BookingStatus } from "./booking";
 import Table from "./table";
 import Menu from "./menu";
 import Loyalty from "./loyalty";
@@ -439,4 +439,5 @@ export {
   TransactionUpdate,
   TransactionRequest,
   TransactionLogsResponse,
+  BookingStatus,
 };

@@ -62,7 +62,7 @@ describe("Location", () => {
   test("Should request for products with or without options", async () => {
     const posId = "345sd";
     await expect(
-      doshii.menu.getProducts(locationId, posId)
+      doshii.menu.getProduct(locationId, posId)
     ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -76,7 +76,7 @@ describe("Location", () => {
     });
 
     await expect(
-      doshii.menu.getProducts(locationId, posId, {
+      doshii.menu.getProduct(locationId, posId, {
         filtered: false,
       })
     ).resolves.toBeDefined();

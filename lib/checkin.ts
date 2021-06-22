@@ -1,4 +1,40 @@
 import { AxiosRequestConfig } from "axios";
+import { OrderStatus } from "./order";
+import { Consumer } from "./sharedSchema";
+
+export interface CheckinResponse {
+  id: string;
+  status: "pending" | "cancelled" | "accepted" | "rejected" | "complete";
+  ref: string;
+  tableNames: Array<string>;
+  covers: number;
+  bookingId: string;
+  completedAt: string | null;
+  consumer: Consumer;
+  rejectionCode: "CH01" | "CH02" | "CH03" | "CH04" | "CH05" | "POSISE";
+  rejectionReason: string;
+  posTerminalId: string;
+  updatedAt: string;
+  createdAt: string;
+  uri: string;
+}
+
+export interface CheckinRequest {
+  ref: string;
+  status?: "pending" | "cancelled" | "accepted" | "rejected" | "complete";
+  tableNames: Array<string>;
+  covers: number;
+  completedAt: string | null;
+  log: {
+    employeeId: number;
+    employeePosRef: string;
+    employeeName: string;
+    deviceRef: string;
+    deviceName: string;
+    area: string;
+  };
+  consumer: Consumer;
+}
 
 export default class Checkin {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
@@ -13,7 +49,7 @@ export default class Checkin {
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param checkinId The ID of the checkin you'd like to retrieve, if not provided
    * all checkins in the location are retrieved
-   * @param options Optional filters
+   * @param filters Optional filters
    *    from: Minimum checkin creation date and time (in Epoch-time), default is 60 mins ago
    *    to: Maximum checkin creation date and time (in Epoch-time), default is 60 mins ahead
    *    updatedFrom: Minimum checkin update date and time (in Epoch-time), no default
@@ -25,7 +61,7 @@ export default class Checkin {
   async get(
     locationId: string,
     checkinId?: string,
-    options?: {
+    filters?: {
       from?: Date;
       to?: Date;
       updatedFrom?: Date;
@@ -33,7 +69,7 @@ export default class Checkin {
       offset?: number;
       limit?: number;
     }
-  ) {
+  ): Promise<CheckinResponse | Array<CheckinResponse>> {
     let req: AxiosRequestConfig = {
       method: "GET",
       headers: {
@@ -46,15 +82,15 @@ export default class Checkin {
         url: `/checkins/${checkinId}`,
       });
     } else {
-      let params: any = options;
-      if (options) {
-        if (options.from)
-          params.from = Math.floor(options.from.getTime() / 1000);
-        if (options.to) params.to = Math.floor(options.to.getTime() / 1000);
-        if (options.updatedFrom)
-          params.updatedFrom = Math.floor(options.updatedFrom.getTime() / 1000);
-        if (options.updatedTo)
-          params.updatedTo = Math.floor(options.updatedTo.getTime() / 1000);
+      let params: any = filters;
+      if (filters) {
+        if (filters.from)
+          params.from = Math.floor(filters.from.getTime() / 1000);
+        if (filters.to) params.to = Math.floor(filters.to.getTime() / 1000);
+        if (filters.updatedFrom)
+          params.updatedFrom = Math.floor(filters.updatedFrom.getTime() / 1000);
+        if (filters.updatedTo)
+          params.updatedTo = Math.floor(filters.updatedTo.getTime() / 1000);
       }
       return this.requestMaker({
         ...req,
@@ -62,6 +98,46 @@ export default class Checkin {
         params,
       });
     }
+  }
+
+  /**
+   *
+   * Retrieve Checkins for a Location
+   * @param locationId The hashed Location ID of the location you are interacting with
+   * @param options Optional filters
+   *    from: Minimum checkin creation date and time (in Epoch-time), default is 60 mins ago
+   *    to: Maximum checkin creation date and time (in Epoch-time), default is 60 mins ahead
+   *    updatedFrom: Minimum checkin update date and time (in Epoch-time), no default
+   *    updatedTo: Maximum checkin update date and time (in Epoch-time), no default
+   *    offset: Number of matching records to skip before returning the matches, default is 0
+   *    limit: Max number of records to return, default is 50, max is 250
+   * @returns The checkins that match the criteria
+   */
+  async getAll(
+    locationId: string,
+    filters?: {
+      from?: Date;
+      to?: Date;
+      updatedFrom?: Date;
+      updatedTo?: Date;
+      offset?: number;
+      limit?: number;
+    }
+  ): Promise<Array<CheckinResponse>> {
+    return this.get(locationId, undefined, filters) as Promise<
+      Array<CheckinResponse>
+    >;
+  }
+
+  /**
+   *
+   * Retrieve Checkins for a Location
+   * @param locationId The hashed Location ID of the location you are interacting with
+   * @param checkinId The ID of the checkin you'd like to retrieve
+   * @returns The requsted checkin
+   */
+  async getOne(locationId: string, checkingId: string) {
+    return this.get(locationId, checkingId) as Promise<CheckinResponse>;
   }
 
   /**
@@ -76,13 +152,7 @@ export default class Checkin {
     locationId: string,
     checkinId: string,
     options?: {
-      status:
-        | "pending"
-        | "rejected"
-        | "accepted"
-        | "complete"
-        | "cancelled"
-        | "venue_cancelled";
+      status: OrderStatus;
     }
   ) {
     return this.requestMaker({
@@ -101,7 +171,7 @@ export default class Checkin {
    * @param data Checkin data
    * @returns The checkin that was created
    */
-  create(locationId: string, data: any) {
+  create(locationId: string, data: CheckinRequest): Promise<CheckinResponse> {
     return this.requestMaker({
       url: "/checkins",
       method: "POST",
@@ -119,7 +189,11 @@ export default class Checkin {
    * @param data Checkin data
    * @returns The checkin that was updated
    */
-  update(locationId: string, checkinId: string, data: any) {
+  update(
+    locationId: string,
+    checkinId: string,
+    data: CheckinRequest
+  ): Promise<CheckinResponse> {
     return this.requestMaker({
       url: `/checkins/${checkinId}`,
       method: "PUT",

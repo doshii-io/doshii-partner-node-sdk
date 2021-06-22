@@ -1,4 +1,100 @@
 import { AxiosRequestConfig } from "axios";
+import { Surcounts } from "./sharedSchema";
+
+interface MenuAltNames {
+  default: {
+    display: string;
+    kitchen: string;
+    default: string;
+  };
+  additionalProperties: {
+    display: string;
+    kitchen: string;
+    default: string;
+  };
+}
+interface MenuOptions {
+  posId: string;
+  name: string;
+  min: string;
+  max: string;
+  variants: Array<{
+    posId: string;
+    name: string;
+    price: string;
+    alternateNames: MenuAltNames;
+  }>;
+  alternateNames: MenuAltNames;
+}
+interface MenuProductIds {
+  "gtin-8": string;
+  "gtin-12": string;
+  "gtin-13": string;
+  "gtin-14": string;
+  sku: string;
+  plu: string;
+  barcodes: Array<string>;
+}
+
+export interface MenuProduct {
+  posId: string;
+  name: string;
+  type: "single" | "bundle";
+  availability: "available" | "unavailable";
+  productIds: MenuProductIds;
+  description: string;
+  unitPrice: number;
+  tags: Array<string>;
+  dietary: Array<
+    | "contains-alcohol"
+    | "contains-dairy"
+    | "contains-nuts"
+    | "gluten-free"
+    | "spicy"
+    | "vegan"
+    | "vegetarian"
+  >;
+  menuDir: Array<string>;
+  includedItems: Array<{
+    posId: string;
+    productIds: MenuProductIds;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    options: MenuOptions;
+    alternateNames: MenuAltNames;
+  }>;
+  bundledItems: Array<{
+    posId: string;
+    name: string;
+    min: number;
+    max: number;
+    includedItems: Array<{
+      posId: string;
+      productIds: MenuProductIds;
+      name: string;
+      quantity: number;
+      unitPrice: number;
+      options: MenuOptions;
+      alternateNames: MenuAltNames;
+    }>;
+  }>;
+  options: Array<MenuOptions>;
+  surcounts: Array<Surcounts>;
+  alternateNames: MenuAltNames;
+  imageUri: string;
+}
+export interface MenuResponse {
+  description: string;
+  imageUri: string;
+  surcounts: Array<Surcounts>;
+  options: Array<MenuOptions>;
+  products: Array<MenuProduct>;
+  updatedAt: string;
+  createdAt: string;
+  version: string;
+  uri: string;
+}
 
 export default class Menu {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
@@ -21,7 +117,7 @@ export default class Menu {
       lastVersion?: string;
       filtered?: boolean;
     }
-  ) {
+  ): Promise<MenuResponse> {
     return await this.requestMaker({
       url: `/locations/${locationId}/menu`,
       method: "GET",
@@ -40,13 +136,13 @@ export default class Menu {
    *  filtered: Indicates whether or not to retrieve a filtered view of the menu item based on the requesting App.
    * @returns The requested location's menu item
    */
-  async getProducts(
+  async getProduct(
     locationId: string,
     posId: string,
     options?: {
       filtered: boolean;
     }
-  ) {
+  ): Promise<MenuProduct> {
     return await this.requestMaker({
       url: `/locations/${locationId}/menu/products/${posId}`,
       method: "GET",
@@ -71,7 +167,7 @@ export default class Menu {
     options?: {
       filtered: boolean;
     }
-  ) {
+  ): Promise<MenuOptions> {
     return await this.requestMaker({
       url: `/locations/${locationId}/menu/options/${posId}`,
       method: "GET",
@@ -96,7 +192,7 @@ export default class Menu {
     options?: {
       filtered: boolean;
     }
-  ) {
+  ): Promise<Surcounts> {
     return await this.requestMaker({
       url: `/locations/${locationId}/menu/surcounts/${posId}`,
       method: "GET",
