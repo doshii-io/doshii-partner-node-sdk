@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from "axios";
+import { LocationClasses } from "./sharedSchema";
 
 export type LocationResponse = {
   id: string;
@@ -16,25 +17,7 @@ export type LocationResponse = {
   email?: string;
   publicWebsiteUrl?: string;
   mappedLocationId?: string;
-  classification?:
-    | "Accommodation"
-    | "Amateur"
-    | "Sport"
-    | "Bakery"
-    | "Bar"
-    | "Café"
-    | "Cinema"
-    | "Club"
-    | "Education"
-    | "Golf"
-    | "Club"
-    | "Gym"
-    | "Pub"
-    | "QSR"
-    | "Restaurant"
-    | "Takeaway"
-    | "Food"
-    | "Test";
+  classification?: LocationClasses
   vendor?: string;
   organisationId: string;
   updatedAt: string;

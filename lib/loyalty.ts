@@ -1,4 +1,170 @@
 import { AxiosRequestConfig } from "axios";
+import { Surcounts, LogsResponse } from "./sharedSchema";
+
+interface LoyaltyRewardItemOptions {
+  posId: string;
+  name: string;
+  variants: [
+    {
+      posId: string;
+      name: string;
+      price: string;
+    }
+  ];
+}
+interface LoyaltyRewardItem {
+  rewardRef: string;
+  uuid: string;
+  posId: string;
+  name: string;
+  quantity: number;
+  description: string;
+  unitPrice: string;
+  totalBeforeSurcounts: string;
+  totalAfterSurcounts: string;
+  tags: Array<string>;
+  type: "bundle" | "single";
+  includedItems: [
+    {
+      name: string;
+      posId: string;
+      quantity: number;
+      unitPrice: string;
+      options: Array<LoyaltyRewardItemOptions>;
+    }
+  ];
+  surcounts: [
+    {
+      posId: "123";
+      name: "Item name";
+      description: "Item description";
+      amount: 1000;
+      type: "absolute";
+      value: "1000";
+    }
+  ];
+  options: Array<LoyaltyRewardItemOptions>;
+}
+
+interface LoyaltyMember {
+  ref: string;
+  name: string;
+  imageUri: string;
+}
+export interface LoyaltyCheckinResponse {
+  id: number;
+  locationId: string;
+  status: "pending" | "active" | "rejected" | "complete";
+  member: LoyaltyMember;
+  rewards: {
+    items: Array<LoyaltyRewardItem>;
+    surcounts: Array<Surcounts>;
+  };
+  rejectionReason: string;
+  createdAt: string;
+  updatedAt: string;
+  uri: string;
+}
+
+export interface LoyaltyCheckinRequest {
+  status?: "active";
+  member: LoyaltyMember;
+  rewards: {
+    items: Array<LoyaltyRewardItem>;
+    surcounts: Array<Surcounts>;
+  };
+}
+
+export interface LoyaltyMemberEnquiryRequest {
+  members: Array<{
+    ref: string;
+    name: string;
+    email: string;
+    phone: string;
+  }>;
+}
+
+export interface LoyaltyMemberEnquiryResponse {
+  id: string;
+  locationId: string;
+  posTerminalId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoyaltyMemberActivityRequest {
+  status: "accepted" | "rejected";
+  rejectionReason: string;
+  pointsEarned: number;
+  pointsBalance: number;
+  message: string;
+  rewards: {
+    items: Array<LoyaltyRewardItem>;
+    surcounts: Array<Surcounts>;
+  };
+}
+
+export interface LoyaltyMemberActivityResponse {
+  id: string;
+  locationId: string;
+  posTerminalId: string;
+  status: "pending" | "accepted" | "rejected";
+  memberRef: string;
+  orderId: string;
+  rewards: {
+    items: Array<LoyaltyRewardItem>;
+    surcounts: Array<Surcounts>;
+  };
+  rejectionReason: string;
+  createdAt: string;
+  updatedAt: string;
+  uri: string;
+  orderUri: string;
+}
+
+export interface LoyaltyCardResponse {
+  id: string;
+  type: "giftcard";
+  event: "card_enquiry";
+  /**
+   * activated is valid ONLY for card activation responses
+   */
+  status: "pending" | "complete" | "cancelled" | "activated";
+  orderId: string;
+  amount: number;
+  requestedAppId: string;
+  notes: string;
+  reference: string;
+  expiryDate: string;
+  cancelledReason: string;
+  posTerminalId: string;
+  processedByApp: number;
+  uri: string;
+  log: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoyaltyCardRequest {
+  event: "card_enquiry";
+  /**
+   * complete and cancelled are valid for card enquiry requests
+   * cancelled and activated are valid for card activation requests
+   */
+  status: "complete" | "cancelled" | "activated";
+  amount: number;
+  expiryDate: string;
+  reference: string;
+  cancelledReason: string;
+  log: {
+    employeeId: number;
+    employeePosRef: string;
+    employeeName: string;
+    deviceRef: string;
+    deviceName: string;
+    area: string;
+  };
+}
 
 export default class Loyalty {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
@@ -11,7 +177,7 @@ export default class Loyalty {
    * Retrieve loyalty checkins registered by your application for a given location
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param checkInId Optional, ID of the loyalty checkin to retrieve, if not provided all the checkins are retrieved
-   * @param options Optional object with the following filters. Applicable only when requesting all the checkins
+   * @param filters Optional object with the following filters. Applicable only when requesting all the checkins
    *    from: Minimum creation date and time (in Epoch-time) for the loyalty checkin.
    *    to: Maximum create date and time (in Epoch-time) for the loyalty checkin.
    *    offset: Number of matching records to skip before returning the matches, default is 0
@@ -22,14 +188,14 @@ export default class Loyalty {
   async getCheckins(
     locationId: string,
     checkInId?: string,
-    options?: {
+    filters?: {
       from?: Date;
       to?: Date;
       offset?: number;
       limit?: number;
       sort?: "asc" | "desc";
     }
-  ) {
+  ): Promise<Array<LoyaltyCheckinResponse> | LoyaltyCheckinResponse> {
     let req: AxiosRequestConfig = {
       method: "GET",
       headers: {
@@ -42,11 +208,11 @@ export default class Loyalty {
         url: `/loyalty/checkins/${checkInId}`,
       });
     } else {
-      let params: any = options;
-      if (options) {
-        if (options.from)
-          params.from = Math.floor(options.from.getTime() / 1000);
-        if (options.to) params.to = Math.floor(options.to.getTime() / 1000);
+      let params: any = filters;
+      if (filters) {
+        if (filters.from)
+          params.from = Math.floor(filters.from.getTime() / 1000);
+        if (filters.to) params.to = Math.floor(filters.to.getTime() / 1000);
       }
       return this.requestMaker({
         ...req,
@@ -57,12 +223,54 @@ export default class Loyalty {
   }
 
   /**
+   * Retrieve loyalty checkins registered by your application for a given location
+   * @param locationId The hashed Location ID of the location you are interacting with
+   * @param filters Optional object with the following filters. Applicable only when requesting all the checkins
+   *    from: Minimum creation date and time (in Epoch-time) for the loyalty checkin.
+   *    to: Maximum create date and time (in Epoch-time) for the loyalty checkin.
+   *    offset: Number of matching records to skip before returning the matches, default is 0
+   *    limit: Max number of records to return, default is 50, max is 100 (1000 in read-only service)
+   *    sort: Sort loyalty checkins ascending or descending based on creation date. Default is desc.
+   * @param returns The requested loyalty checkins
+   */
+  async getAllCheckins(
+    locationId: string,
+    filters?: {
+      from?: Date;
+      to?: Date;
+      offset?: number;
+      limit?: number;
+      sort?: "asc" | "desc";
+    }
+  ): Promise<Array<LoyaltyCheckinResponse>> {
+    return this.getCheckins(locationId, undefined, filters) as Promise<
+      Array<LoyaltyCheckinResponse>
+    >;
+  }
+
+  /**
+   * Retrieve loyalty checkins registered by your application for a given location
+   * @param locationId The hashed Location ID of the location you are interacting with
+   * @param checkInId ID of the loyalty checkin to retrieve, if not provided all the checkins are retrieved
+   * @param returns The requested loyalty checkin
+   */
+  async getOneCheckin(locationId: string, checkinId: string) {
+    return this.getCheckins(
+      locationId,
+      checkinId
+    ) as Promise<LoyaltyCheckinResponse>;
+  }
+
+  /**
    * Create a loyalty checkin for your App and location
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param data checkin data
    * @returns The registered loyalty checkin
    */
-  async createCheckin(locationId: string, data: any) {
+  async createCheckin(
+    locationId: string,
+    data: LoyaltyCheckinRequest
+  ): Promise<LoyaltyCheckinResponse> {
     return this.requestMaker({
       url: "/loyalty/checkins",
       method: "POST",
@@ -80,7 +288,11 @@ export default class Loyalty {
    * @param data checkin data
    * @returns The loyalty checkin
    */
-  async updateCheckin(locationId: string, checkinId: string, data: any) {
+  async updateCheckin(
+    locationId: string,
+    checkinId: string,
+    data: LoyaltyCheckinRequest
+  ): Promise<LoyaltyCheckinResponse> {
     return this.requestMaker({
       url: `/loyalty/checkins/${checkinId}`,
       method: "PUT",
@@ -97,7 +309,10 @@ export default class Loyalty {
    * @param checkinId The ID of the loyalty checkin to delete
    * @returns status code of the operation
    */
-  async deleteCheckin(locationId: string, checkinId: string) {
+  async deleteCheckin(
+    locationId: string,
+    checkinId: string
+  ): Promise<{ message: string }> {
     return this.requestMaker({
       url: `/loyalty/checkins/${checkinId}`,
       method: "DELETE",
@@ -113,7 +328,11 @@ export default class Loyalty {
    * @param enquiryId The ID of the loyalty member enquiry request to update
    * @param data the data to respond with
    */
-  async respondToEnquiry(locationId: string, enquiryId: string, data: any) {
+  async respondToEnquiry(
+    locationId: string,
+    enquiryId: string,
+    data: LoyaltyMemberEnquiryRequest
+  ): Promise<LoyaltyMemberEnquiryResponse> {
     return this.requestMaker({
       url: `/loyalty/members/enquiry/${enquiryId}`,
       method: "PUT",
@@ -133,8 +352,8 @@ export default class Loyalty {
   async respondToActivityRegisterRequest(
     locationId: string,
     activityId: string,
-    data: any
-  ) {
+    data: LoyaltyMemberActivityRequest
+  ): Promise<LoyaltyMemberActivityResponse> {
     return this.requestMaker({
       url: `/loyalty/members/activity/${activityId}`,
       method: "PUT",
@@ -151,7 +370,10 @@ export default class Loyalty {
    * @param requestId The ID of the enquiry request you'd like to retrieve
    * @returns The enquiry request
    */
-  async getCardEnquiryRequest(locationId: string, requestId: string) {
+  async getCardEnquiryRequest(
+    locationId: string,
+    requestId: string
+  ): Promise<LoyaltyCardResponse> {
     return this.requestMaker({
       url: `/loyalty/cards/enquiry/${requestId}`,
       method: "GET",
@@ -168,7 +390,11 @@ export default class Loyalty {
    * @param data the response data
    * @returns The enquiry request
    */
-  async respondToCardEnquiry(locationId: string, requestId: string, data: any) {
+  async respondToCardEnquiry(
+    locationId: string,
+    requestId: string,
+    data: LoyaltyCardRequest
+  ): Promise<LoyaltyCardResponse> {
     return this.requestMaker({
       url: `/loyalty/cards/enquiry/${requestId}`,
       method: "PUT",
@@ -185,7 +411,10 @@ export default class Loyalty {
    * @param requestId The ID of the enquiry request you'd like to retrieve
    * @returns The audit logs for the request
    */
-  async getCardEnquiryLogs(locationId: string, requestId: string) {
+  async getCardEnquiryLogs(
+    locationId: string,
+    requestId: string
+  ): Promise<Array<LogsResponse>> {
     return this.requestMaker({
       url: `/loyalty/cards/enquiry/${requestId}/logs`,
       method: "GET",
@@ -201,7 +430,10 @@ export default class Loyalty {
    * @param requestId The ID of the activation request you'd like to retrieve
    * @returns The activation request
    */
-  async getCardActivationRequest(locationId: string, requestId: string) {
+  async getCardActivationRequest(
+    locationId: string,
+    requestId: string
+  ): Promise<LoyaltyCardResponse> {
     return this.requestMaker({
       url: `/loyalty/cards/activation/${requestId}`,
       method: "GET",
@@ -221,8 +453,8 @@ export default class Loyalty {
   async respondToCardActivation(
     locationId: string,
     requestId: string,
-    data: any
-  ) {
+    data: LoyaltyCardRequest
+  ): Promise<LoyaltyCardResponse> {
     return this.requestMaker({
       url: `/loyalty/cards/activation/${requestId}`,
       method: "PUT",
@@ -239,7 +471,10 @@ export default class Loyalty {
    * @param requestId The ID of the activation request you'd like to retrieve
    * @returns The audit logs for the request
    */
-  async getCardActivationLogs(locationId: string, requestId: string) {
+  async getCardActivationLogs(
+    locationId: string,
+    requestId: string
+  ): Promise<LogsResponse> {
     return this.requestMaker({
       url: `/loyalty/cards/activation/${requestId}/logs`,
       method: "GET",

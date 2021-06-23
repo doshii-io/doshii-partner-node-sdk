@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Consumer } from "./sharedSchema";
+import { Consumer, LogsResponse } from "./sharedSchema";
 import { CheckinRequest, CheckinResponse } from "./checkin";
 
 export enum BookingStatus {
@@ -44,21 +44,6 @@ export interface BookingRequest {
   ref: string;
   consumer: Consumer;
   version?: string;
-}
-
-export interface BookingLogsResponse {
-  logId: string;
-  employeeId: string;
-  employeeName: string;
-  employeePosRef: string;
-  deviceRef: string;
-  deviceName: string;
-  area: string;
-  appId: string;
-  appName: string;
-  audit: string;
-  action: Array<string>;
-  performedAt: string;
 }
 
 export default class Booking {
@@ -145,10 +130,7 @@ export default class Booking {
    * @param bookingId ID of the booking to retrieve
    * @returns The audit logs for the reservation
    */
-  async getLogs(
-    locationId: string,
-    bookingId: string
-  ): Promise<BookingLogsResponse> {
+  async getLogs(locationId: string, bookingId: string): Promise<LogsResponse> {
     return await this.requestMaker({
       url: `/bookings/${bookingId}/logs`,
       method: "GET",

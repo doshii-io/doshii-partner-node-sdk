@@ -22,3 +22,35 @@ export interface Consumer {
     notes: string;
   };
 }
+
+export interface LogsResponse {
+  logId: string;
+  employeeId: string;
+  employeeName: string;
+  employeePosRef: string;
+  deviceRef: string;
+  deviceName: string;
+  area: string;
+  appId: string;
+  appName: string;
+  audit: string;
+  action: Array<string>;
+  performedAt: string;
+}
+
+export type LocationClasses =
+  | "Accommodation"
+  | "Amateur Sport"
+  | "Bakery"
+  | "Bar"
+  | "Café"
+  | "Cinema"
+  | "Club"
+  | "Education"
+  | "Golf Club"
+  | "Gym"
+  | "Pub"
+  | "QSR"
+  | "Restaurant"
+  | "Takeaway Food"
+  | "Test";

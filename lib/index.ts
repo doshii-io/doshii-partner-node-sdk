@@ -20,10 +20,20 @@ import Webhook, {
 import Booking, { BookingStatus } from "./booking";
 import Table from "./table";
 import Menu from "./menu";
-import Loyalty from "./loyalty";
+import Loyalty, {
+  LoyaltyCardRequest,
+  LoyaltyCardResponse,
+  LoyaltyMemberActivityRequest,
+  LoyaltyMemberActivityResponse,
+  LoyaltyMemberEnquiryResponse,
+  LoyaltyMemberEnquiryRequest,
+  LoyaltyCheckinResponse,
+  LoyaltyCheckinRequest,
+} from "./loyalty";
 import Checkin from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
+import { LocationClasses } from "./sharedSchema";
 
 export enum WebSocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -52,6 +62,44 @@ export enum WebSocketEvents {
   LOYALTY_CHECKIN_UPDATED = "loyalty_checkin_updated",
   LOYALTY_CHECKIN_DELETED = "loyalty_checkin_deleted",
   PONG = "pong",
+}
+
+export interface DataAggregationRequest {
+  doshiiId: string;
+  webhook: {
+    url: string;
+    headers: { string: any };
+  };
+  mimeType: string;
+  fileSize: number;
+  classifiers: Array<LocationClasses>;
+  locations: Array<string>;
+  sortBy: {
+    property: "created" | "updated" | "id";
+    method: "ASC" | "DESC";
+  };
+  range: {
+    start: number;
+    end: number;
+  };
+}
+
+export interface DataAggregationStatusResponse {
+  requestId: string;
+  requestCreatedAt: number;
+  requestCompletedAt: number;
+  status: "pending" | "processing" | "failed" | "complete" | "aborted";
+  files: {
+    uri: string;
+    size: number;
+    expires: number;
+  };
+  tally: {
+    locations: number;
+    orders: number;
+    transactions: number;
+    amount: number;
+  };
 }
 
 export default class Doshii {
@@ -374,7 +422,15 @@ export default class Doshii {
    * @param appId required if not provided during class instantiation else not required
    * @returns The registered bulk data request
    */
-  requestBulkDataAggregation(dataset = "orders", appId?: string) {
+  requestBulkDataAggregation(
+    dataset = "orders",
+    data: DataAggregationRequest,
+    appId?: string
+  ): Promise<{
+    requestId: string;
+    requestCreatedAt: number;
+    status: string;
+  }> {
     if (!this.apiKey) {
       if (!appId) {
         throw new Error(
@@ -390,6 +446,7 @@ export default class Doshii {
       headers: {
         "X-API-KEY": this.apiKey,
       },
+      data,
     });
   }
 
@@ -404,7 +461,7 @@ export default class Doshii {
     requestId: string,
     dataset = "orders",
     appId?: string
-  ) {
+  ): Promise<DataAggregationRequest> {
     if (!this.apiKey) {
       if (!appId) {
         throw new Error(
@@ -440,4 +497,12 @@ export {
   TransactionRequest,
   TransactionLogsResponse,
   BookingStatus,
+  LoyaltyCardRequest,
+  LoyaltyCardResponse,
+  LoyaltyMemberActivityRequest,
+  LoyaltyMemberActivityResponse,
+  LoyaltyMemberEnquiryResponse,
+  LoyaltyMemberEnquiryRequest,
+  LoyaltyCheckinResponse,
+  LoyaltyCheckinRequest,
 };
