@@ -101,7 +101,7 @@ describe("Location", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleLocationResponse] });
-    await expect(doshii.location.get()).resolves.toMatchObject([
+    await expect(doshii.location.getAll()).resolves.toMatchObject([
       sampleLocationResponse,
     ]);
     expect(requestSpy).toBeCalledWith({
@@ -120,7 +120,7 @@ describe("Location", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleLocationResponse });
-    await expect(doshii.location.get(locationId)).resolves.toMatchObject(
+    await expect(doshii.location.getOne(locationId)).resolves.toMatchObject(
       sampleLocationResponse
     );
     expect(requestSpy).toBeCalledWith({
@@ -143,7 +143,7 @@ describe("Location", () => {
     await expect(doshii.location.get()).rejects.toBeDefined();
   });
 
-  test("Should request for health of all locations", async () => {
+  test("Should request for health of all locations with and without filters", async () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleLocationHealthResponse] });
@@ -159,16 +159,39 @@ describe("Location", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/health/locations`,
     });
-    expect(authSpy).toBeCalledTimes(1);
+
+    // with filters
+    await expect(
+      doshii.location.getAllHealths({
+        since: new Date("2021-02-21"),
+        inverse: false,
+        sort: "asc",
+      })
+    ).resolves.toMatchObject([sampleLocationHealthResponse]);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: `/health/locations`,
+      params: {
+        since: 1613865600,
+        inverse: false,
+        sort: "asc",
+      },
+    });
+    expect(authSpy).toBeCalledTimes(2);
   });
 
-  test("Should request for health of all locations", async () => {
+  test("Should request for health of one specific location", async () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleLocationHealthResponse });
-    await expect(doshii.location.getHealth(locationId)).resolves.toMatchObject(
-      sampleLocationHealthResponse
-    );
+    await expect(
+      doshii.location.getOneHealth(locationId)
+    ).resolves.toMatchObject(sampleLocationHealthResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -188,7 +211,7 @@ describe("Location", () => {
       data: [sampleLocationTerminalResponse],
     });
     await expect(
-      doshii.location.getTerminal(locationId)
+      doshii.location.getAllTerminals(locationId)
     ).resolves.toMatchObject([sampleLocationTerminalResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -203,14 +226,14 @@ describe("Location", () => {
     expect(authSpy).toBeCalledTimes(1);
   });
 
-  test("Should request for all terminals at location", async () => {
+  test("Should request for one specific terminal at location", async () => {
     const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
       status: 200,
       data: sampleLocationTerminalResponse,
     });
     const terminalId = "terdfasdio908324";
     await expect(
-      doshii.location.getTerminal(locationId, terminalId)
+      doshii.location.getOneTerminal(locationId, terminalId)
     ).resolves.toMatchObject(sampleLocationTerminalResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {

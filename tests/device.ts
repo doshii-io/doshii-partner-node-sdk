@@ -54,7 +54,9 @@ describe("Device", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleResponse] });
-    await expect(doshii.device.get()).resolves.toMatchObject([sampleResponse]);
+    await expect(doshii.device.getAll()).resolves.toMatchObject([
+      sampleResponse,
+    ]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -72,7 +74,7 @@ describe("Device", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleResponse });
     const deviceId = "some0Location5Id9";
-    await expect(doshii.device.get(deviceId)).resolves.toMatchObject(
+    await expect(doshii.device.getOne(deviceId)).resolves.toMatchObject(
       sampleResponse
     );
     expect(requestSpy).toBeCalledWith({

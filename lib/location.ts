@@ -17,7 +17,7 @@ export type LocationResponse = {
   email?: string;
   publicWebsiteUrl?: string;
   mappedLocationId?: string;
-  classification?: LocationClasses
+  classification?: LocationClasses;
   vendor?: string;
   organisationId: string;
   updatedAt: string;
@@ -142,10 +142,19 @@ export default class Location {
    * Retrieve Location health
    * @param locationId hashed ID of the location.
    * If not provided all the linked location health data are returned
+   * @param filters Optional filters
+   *  since: The date and time (seconds since Epoch) <= Location's last heartbeat. Eg. 1481979234
+   *  inverse: Inverse the results to only show locations that haven't sent heartbeats, e.g. true/false. Default is false
+   *  sort: Sort locations ascending or descending based on last heartbeat date. Default is desc.
    * @returns location health details
    */
   async getHealth(
-    locationId?: string
+    locationId?: string,
+    filters?: {
+      since?: Date;
+      inverse?: boolean;
+      sort?: "asc" | "desc";
+    }
   ): Promise<Array<LocationHealth> | LocationHealth> {
     let requestData: AxiosRequestConfig = {
       method: "GET",
@@ -159,9 +168,15 @@ export default class Location {
         },
       };
     } else {
+      let params: any = filters;
+      if (filters) {
+        if (filters.since)
+          params.since = Math.floor(filters.since.getTime() / 1000);
+      }
       requestData = {
         ...requestData,
         url: "/health/locations",
+        params,
       };
     }
     return await this.requestMaker(requestData);
@@ -178,10 +193,18 @@ export default class Location {
 
   /**
    * Retrieve all Location health
+   * @param filters Optional filters
+   *  since: The date and time (seconds since Epoch) <= Location's last heartbeat. Eg. 1481979234
+   *  inverse: Inverse the results to only show locations that haven't sent heartbeats, e.g. true/false. Default is false
+   *  sort: Sort locations ascending or descending based on last heartbeat date. Default is desc.
    * @returns location health details
    */
-  async getAllHealths(): Promise<Array<LocationHealth>> {
-    return this.getHealth() as Promise<Array<LocationHealth>>;
+  async getAllHealths(filters?: {
+    since?: Date;
+    inverse?: boolean;
+    sort?: "asc" | "desc";
+  }): Promise<Array<LocationHealth>> {
+    return this.getHealth(undefined, filters) as Promise<Array<LocationHealth>>;
   }
 
   /**

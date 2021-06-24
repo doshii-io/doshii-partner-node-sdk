@@ -70,7 +70,7 @@ describe("Booking", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
     await expect(
-      doshii.checkin.get(locationId, "", {
+      doshii.checkin.getAll(locationId, {
         from: new Date("01-01-2021"),
         to: new Date("01-02-2021"),
         updatedFrom: new Date("01-01-2021"),
