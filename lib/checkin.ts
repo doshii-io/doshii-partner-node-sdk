@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { OrderStatus } from "./order";
+import { OrderResponse, OrderStatus } from "./order";
 import { Consumer } from "./sharedSchema";
 
 export interface CheckinResponse {
@@ -154,7 +154,7 @@ export default class Checkin {
     options?: {
       status: OrderStatus;
     }
-  ) {
+  ): Promise<Array<OrderResponse>> {
     return this.requestMaker({
       url: `/checkins/${checkinId}/orders`,
       method: "GET",

@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { OrderStatus } from "./order";
+import { OrderResponse, OrderStatus } from "./order";
 import { BookingResponses, BookingStatus } from "./booking";
 import { CheckinResponse } from "./checkin";
 
@@ -153,7 +153,7 @@ export default class Table {
     options?: {
       status: OrderStatus;
     }
-  ) {
+  ): Promise<Array<OrderResponse>> {
     return await this.requestMaker({
       url: `/tables/${name}/orders`,
       method: "GET",

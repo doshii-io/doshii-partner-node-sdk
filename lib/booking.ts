@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import { Consumer, LogsResponse } from "./sharedSchema";
 import { CheckinRequest, CheckinResponse } from "./checkin";
+import { OrderRequest, OrderResponse, OrderResponses } from "./order";
 
 export enum BookingStatus {
   PENDING = "pending",
@@ -146,7 +147,10 @@ export default class Booking {
    * @param bookingId ID of the booking to retrieve
    * @returns The preorders associated to the booking
    */
-  async getPreorders(locationId: string, bookingId: string) {
+  async getPreorders(
+    locationId: string,
+    bookingId: string
+  ): Promise<OrderResponses> {
     return await this.requestMaker({
       url: `/bookings/${bookingId}/preorders`,
       method: "GET",
@@ -246,7 +250,11 @@ export default class Booking {
    * @param data Preorder data
    * @returns The preorder that was created
    */
-  async createPreorder(locationId: string, bookingId: string, data: any) {
+  async createPreorder(
+    locationId: string,
+    bookingId: string,
+    data: OrderRequest
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/bookings/${bookingId}/preorder`,
       method: "POST",

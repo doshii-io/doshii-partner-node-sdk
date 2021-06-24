@@ -461,7 +461,6 @@ export default class Order {
    * @param orderId Order ID
    * @returns The order that was updated
    */
-
   async subscribeTo(
     locationId: string,
     orderId: string
