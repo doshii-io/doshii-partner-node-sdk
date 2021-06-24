@@ -4,13 +4,19 @@ import crypto from "crypto";
 import WebSocket from "ws";
 
 import Location, { LocationResponse } from "./location";
-import Order, { OrderRetrievalFilters, OrderStatus } from "./order";
+import Order, {
+  OrderRetrievalFilters,
+  OrderStatus,
+  OrderResponse,
+  OrderPreprocess,
+  OrderResponses,
+  OrderRequest,
+} from "./order";
 import Device, { DeviceResponse, DeviceRegister, DeviceUpdate } from "./device";
 import Transaction, {
   TransactionResponse,
   TransactionUpdate,
   TransactionRequest,
-  TransactionLogsResponse,
 } from "./transaction";
 import Webhook, {
   DoshiiEvents,
@@ -33,7 +39,7 @@ import Loyalty, {
 import Checkin from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
-import { LocationClasses } from "./sharedSchema";
+import { LocationClasses, Product, LogsResponse } from "./sharedSchema";
 
 export enum WebSocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -461,7 +467,7 @@ export default class Doshii {
     requestId: string,
     dataset = "orders",
     appId?: string
-  ): Promise<DataAggregationRequest> {
+  ): Promise<DataAggregationStatusResponse> {
     if (!this.apiKey) {
       if (!appId) {
         throw new Error(
@@ -495,7 +501,7 @@ export {
   TransactionResponse,
   TransactionUpdate,
   TransactionRequest,
-  TransactionLogsResponse,
+  LogsResponse,
   BookingStatus,
   LoyaltyCardRequest,
   LoyaltyCardResponse,
@@ -505,4 +511,9 @@ export {
   LoyaltyMemberEnquiryRequest,
   LoyaltyCheckinResponse,
   LoyaltyCheckinRequest,
+  Product,
+  OrderResponse,
+  OrderPreprocess,
+  OrderResponses,
+  OrderRequest,
 };

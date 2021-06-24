@@ -1,4 +1,4 @@
-export interface Surcounts {
+export interface Surcount {
   posId: string;
   name: string;
   description: string;
@@ -54,3 +54,49 @@ export type LocationClasses =
   | "Restaurant"
   | "Takeaway Food"
   | "Test";
+
+export interface ProductOptions {
+  posId: string;
+  name: string;
+  variants: [
+    {
+      posId: string;
+      name: string;
+      price: string;
+    }
+  ];
+}
+
+export interface Product {
+  rewardRef: string;
+  uuid: string;
+  posId: string;
+  name: string;
+  quantity: number;
+  description: string;
+  unitPrice: string;
+  totalBeforeSurcounts: string;
+  totalAfterSurcounts: string;
+  tags: Array<string>;
+  type: "bundle" | "single";
+  includedItems: [
+    {
+      name: string;
+      posId: string;
+      quantity: number;
+      unitPrice: string;
+      options: Array<ProductOptions>;
+    }
+  ];
+  surcounts: [
+    {
+      posId: "123";
+      name: "Item name";
+      description: "Item description";
+      amount: 1000;
+      type: "absolute";
+      value: "1000";
+    }
+  ];
+  options: Array<ProductOptions>;
+}

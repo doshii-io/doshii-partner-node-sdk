@@ -1,4 +1,7 @@
 import { AxiosRequestConfig } from "axios";
+import { CheckinResponse } from "./checkin";
+import { Consumer, LogsResponse, Product, Surcount } from "./sharedSchema";
+import { TransactionRequest, TransactionResponse } from "./transaction";
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -7,6 +10,130 @@ export enum OrderStatus {
   CANCELLED = "cancelled",
   COMPLETE = "complete",
   VENUE_CANCELLED = "venue_cancelled",
+}
+
+type Tax = {
+  posId: string;
+  name: string;
+  amount: string;
+  type: "absolute" | "percentage";
+  taxType: "exclusive" | "inclusive";
+  value: string;
+};
+interface ProductWithTaxes extends Product {
+  taxes: Array<Tax>;
+}
+interface AddItemsRequest
+  extends Omit<ProductWithTaxes, "uuid" | "rewardRef"> {}
+
+type MealPhase =
+  | "ordered"
+  | " delayed"
+  | " appetiser_preparing"
+  | " entree_preparing"
+  | " main_preparing"
+  | " dessert_preparing"
+  | " appetiser_prepared"
+  | " entree_prepared"
+  | " main_prepared"
+  | " dessert_prepared"
+  | " appetiser_served"
+  | " entree_served"
+  | " main_served"
+  | " dessert_served"
+  | " billed"
+  | " fulfilled"
+  | " delivering"
+  | " delivered ";
+export interface OrderResponse {
+  id: string;
+  posRef: string;
+  externalOrder: string;
+  deliveryOrderId: string;
+  locationId: string;
+  checkinId: string;
+  manuallyProcessed: boolean;
+  mealPhase: MealPhase;
+  status: OrderStatus;
+  type: "delivery" | " pickup" | " dinein";
+  notes: string;
+  revenueCentre: string;
+  requiredAt: string;
+  availableEta: string;
+  items: Array<ProductWithTaxes>;
+  unapprovedItems: Array<ProductWithTaxes>;
+  consumer: Consumer;
+  surcounts: Array<Surcount>;
+  taxes: Array<Tax> | null;
+  checkin: CheckinResponse;
+  rejectionCode:
+    | "01"
+    | "02"
+    | " 03"
+    | " 04"
+    | " 05"
+    | " 06"
+    | " 07"
+    | " 08"
+    | " 09"
+    | " 010"
+    | " 012"
+    | " 013"
+    | " MAR1"
+    | " MAR2"
+    | " MAR3"
+    | " POSSIE";
+  delivery: {
+    status: "delivering" | " delivered" | " failed";
+    displayId: string;
+    phase?: string;
+    failedReason: string;
+    deliveryEta: string;
+    driverName: string;
+    driverPhone: string;
+    trackingUrl: string;
+  };
+  transactions: Array<TransactionResponse>;
+  rejectionReason: string;
+  preorderBookingId: string;
+  posTerminalId: string;
+  posDisplayId: string;
+  posCreatedAt: string;
+  updatedAt: string;
+  createdAt: string;
+  version: string;
+  uri: string;
+  transactionUri: string;
+  log: string;
+}
+export interface OrderResponses {
+  count: number;
+  offset: number;
+  limit: number;
+  rows: Array<OrderResponse>;
+}
+
+export interface OrderPreprocess {
+  checkinId: string;
+  externalOrderRef: string;
+  manuallyProcesssed: string;
+  status: OrderStatus;
+  type: "delivery" | " pickup" | " dinein ";
+  revenueCentre: string;
+  notes: string;
+  requiredAt: string;
+  availableEta: string;
+  items: Array<ProductWithTaxes>;
+  surcounts: Array<Surcount>;
+  taxes: Array<Tax>;
+  log: LogsResponse;
+}
+export interface OrderRequest {
+  order: OrderPreprocess;
+  consumer: Consumer;
+  transactions: Array<TransactionRequest>;
+  members: Array<string>;
+  posTerminalId: string;
 }
 
 export type OrderRetrievalFilters = {
@@ -58,7 +185,10 @@ export default class Order {
    * @param data Order data
    * @returns the order created
    */
-  async createOrder(locationId: string, data: any) {
+  async createOrder(
+    locationId: string,
+    data: OrderRequest
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       headers: {
         "doshii-location-id": locationId,
@@ -83,7 +213,7 @@ export default class Order {
     locationId: string,
     orderId?: string,
     filters?: OrderRetrievalFilters
-  ) {
+  ): Promise<OrderResponse | OrderResponses> {
     let requestData: AxiosRequestConfig = {
       headers: {
         "doshii-location-id": locationId,
@@ -117,13 +247,44 @@ export default class Order {
   }
 
   /**
+   *
+   * Retrieve a list of Orders
+   * @param locationId hashed location ID of the location
+   * @param filters optional filters
+   * @returns All orders
+   */
+  async getAll(locationId: string, filters?: OrderRetrievalFilters) {
+    return this.get(locationId, undefined, filters) as Promise<OrderResponses>;
+  }
+
+  /**
+   *
+   * Retrieve a list of Orders
+   * @param locationId hashed location ID of the location
+   * @param orderId order id to be retrieved,
+   * @returns requested order
+   */
+  async getOne(locationId: string, orderId: string) {
+    return this.get(locationId, orderId) as Promise<OrderResponse>;
+  }
+
+  /**
    * Update an Order at a Location
    * @param locationId hashed location ID of the location
    * @param orderId Order ID to be updated
    * @param data Updated order data
    * @returns The order that was updated
    */
-  async update(locationId: string, orderId: string, data: any) {
+  async update(
+    locationId: string,
+    orderId: string,
+    data: {
+      status: OrderStatus;
+      mealPhase: MealPhase;
+      version: string;
+      log: LogsResponse;
+    }
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}`,
       method: "PUT",
@@ -141,7 +302,22 @@ export default class Order {
    * @param data Updated data
    * @returns The order that was updated
    */
-  async updateDelivery(locationId: string, orderId: string, data: any) {
+  async updateDelivery(
+    locationId: string,
+    orderId: string,
+    data: {
+      deliveryOrderId?: string;
+      status?: "delivering" | " delivered" | " failed";
+      displayId?: string;
+      phase?: string;
+      failedReason: string;
+      deliveryEta: string;
+      driverName: string;
+      driverPhone: string;
+      trackingUrl: string;
+      version: string;
+    }
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/delivery`,
       method: "PUT",
@@ -158,7 +334,7 @@ export default class Order {
    * @param orderId Order ID to be retrieved
    * @returns The audit logs for the order
    */
-  async getLogs(locationId: string, orderId: string) {
+  async getLogs(locationId: string, orderId: string): Promise<LogsResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/logs`,
       method: "GET",
@@ -175,7 +351,11 @@ export default class Order {
    * @param data updated data
    * @returns The order that was updated
    */
-  async addItems(locationId: string, orderId: string, data: any) {
+  async addItems(
+    locationId: string,
+    orderId: string,
+    data: AddItemsRequest
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/items`,
       method: "POST",
@@ -194,7 +374,15 @@ export default class Order {
    * @returns The order that was deleted
    *
    */
-  async removeItems(locationId: string, orderId: string, data: any) {
+  async removeItems(
+    locationId: string,
+    orderId: string,
+    data: {
+      cancelledItems: Array<string>;
+      version: string;
+      log: LogsResponse;
+    }
+  ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/items`,
       method: "DELETE",
@@ -212,7 +400,15 @@ export default class Order {
    * @param data Order data
    * @returns The preprocess request that was created
    */
-  async preprocess(locationId: string, data: any) {
+  async preprocess(
+    locationId: string,
+    data: OrderPreprocess
+  ): Promise<{
+    id: string;
+    locationId: string;
+    status: "pending" | " rejected" | " complete ";
+    createdAt: string;
+  }> {
     return await this.requestMaker({
       url: `/orders/preprocess`,
       method: "POST",
@@ -252,6 +448,47 @@ export default class Order {
     return await this.requestMaker({
       url: `/orders/${orderId}/transactions`,
       method: "GET",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+    });
+  }
+
+  /**
+   * Register interest in an order for the purposes of
+   * receiving Doshii events when the order is updated.
+   * @param locationId hashed location ID of the location
+   * @param orderId Order ID
+   * @returns The order that was updated
+   */
+
+  async subscribeTo(
+    locationId: string,
+    orderId: string
+  ): Promise<OrderResponse> {
+    return await this.requestMaker({
+      url: `/orders/${orderId}/subscription`,
+      method: "POST",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+    });
+  }
+
+  /**
+   * Unregister interest in an order that was previously
+   * subscribed via the POST subscription endpoint
+   * @param locationId hashed location ID of the location
+   * @param orderId Order ID
+   * @returns The order that was updated
+   */
+  async unsubscribeFrom(
+    locationId: string,
+    orderId: string
+  ): Promise<{ message: string }> {
+    return await this.requestMaker({
+      url: `/orders/${orderId}/subscription`,
+      method: "DELETE",
       headers: {
         "doshii-location-id": locationId,
       },

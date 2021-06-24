@@ -1,61 +1,46 @@
 import { AxiosRequestConfig } from "axios";
-import { Surcounts } from "./sharedSchema";
+import { Surcount, LogsResponse } from "./sharedSchema";
+
+type PaymentMethod =
+  | "cash"
+  | "visa"
+  | "mastercard"
+  | "eftpos"
+  | "amex"
+  | "diners"
+  | "giftcard"
+  | "loyalty"
+  | "credit"
+  | "crypto"
+  | "directdeposit"
+  | "cheque"
+  | "alipay"
+  | "wechatpay"
+  | "zip"
+  | "moto"
+  | "other";
 
 export interface TransactionRequest {
   amount: number;
   reference: string;
   invoice: string;
   linkedTrxId: string;
-  method:
-    | "cash"
-    | "visa"
-    | "mastercard"
-    | "eftpos"
-    | "amex"
-    | "diners"
-    | "giftcard"
-    | "loyalty"
-    | "credit"
-    | "crypto"
-    | "directdeposit"
-    | "cheque"
-    | "alipay"
-    | "wechatpay"
-    | "zip"
-    | "moto"
-    | "other";
+  method: PaymentMethod;
   tip: number;
   trn: string;
   prepaid: boolean;
-  surcounts: Array<Surcounts>;
+  surcounts: Array<Surcount>;
 }
 
 export interface TransactionUpdate {
   amount: number;
   reference: string;
   invoice: string;
-  method:
-    | "cash"
-    | "visa"
-    | "mastercard"
-    | "eftpos"
-    | "amex"
-    | "diners"
-    | "giftcard"
-    | "loyalty"
-    | "credit"
-    | "crypto"
-    | "directdeposit"
-    | "cheque"
-    | "alipay"
-    | "wechatpay"
-    | "zip"
-    | "moto"
-    | "other";
+  method: PaymentMethod;
   tip: number;
   trn: string;
   prepaid: boolean;
-  surcounts: Array<Surcounts>;
+  surcounts: Array<Surcount>;
   version: string;
   status:
     | "requested"
@@ -82,7 +67,15 @@ export interface TransactionUpdate {
   };
 }
 
-export interface TransactionResponse extends TransactionRequest {
+export interface TransactionResponse {
+  amount: number;
+  reference: string;
+  invoice: string;
+  linkedTrxId: string;
+  method: PaymentMethod;
+  tip: number;
+  trn: string;
+  surcount: Array<Surcount>;
   id: string;
   orderId: string;
   acceptLess: boolean;
@@ -105,21 +98,6 @@ export interface TransactionResponse extends TransactionRequest {
   processedByApp: string;
   posTerminalId: string;
   requestedAppId: string;
-}
-
-export interface TransactionLogsResponse {
-  logId: string;
-  employeeId: string;
-  employeeName: string;
-  employeePosRef: string;
-  deviceRef: string;
-  deviceName: string;
-  area: string;
-  appId: string;
-  appName: string;
-  audit: string;
-  action: Array<string>;
-  performedAt: string;
 }
 
 export default class Transaction {
@@ -177,7 +155,7 @@ export default class Transaction {
   async getLogs(
     locationId: string,
     transactionId: string
-  ): Promise<TransactionLogsResponse> {
+  ): Promise<LogsResponse> {
     return await this.requestMaker({
       url: `/transactions/${transactionId}/logs`,
       method: "GET",

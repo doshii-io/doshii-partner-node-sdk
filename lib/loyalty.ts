@@ -1,50 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Surcounts, LogsResponse } from "./sharedSchema";
-
-interface LoyaltyRewardItemOptions {
-  posId: string;
-  name: string;
-  variants: [
-    {
-      posId: string;
-      name: string;
-      price: string;
-    }
-  ];
-}
-interface LoyaltyRewardItem {
-  rewardRef: string;
-  uuid: string;
-  posId: string;
-  name: string;
-  quantity: number;
-  description: string;
-  unitPrice: string;
-  totalBeforeSurcounts: string;
-  totalAfterSurcounts: string;
-  tags: Array<string>;
-  type: "bundle" | "single";
-  includedItems: [
-    {
-      name: string;
-      posId: string;
-      quantity: number;
-      unitPrice: string;
-      options: Array<LoyaltyRewardItemOptions>;
-    }
-  ];
-  surcounts: [
-    {
-      posId: "123";
-      name: "Item name";
-      description: "Item description";
-      amount: 1000;
-      type: "absolute";
-      value: "1000";
-    }
-  ];
-  options: Array<LoyaltyRewardItemOptions>;
-}
+import { Surcount, LogsResponse, Product } from "./sharedSchema";
 
 interface LoyaltyMember {
   ref: string;
@@ -57,8 +12,8 @@ export interface LoyaltyCheckinResponse {
   status: "pending" | "active" | "rejected" | "complete";
   member: LoyaltyMember;
   rewards: {
-    items: Array<LoyaltyRewardItem>;
-    surcounts: Array<Surcounts>;
+    items: Array<Product>;
+    surcounts: Array<Surcount>;
   };
   rejectionReason: string;
   createdAt: string;
@@ -70,8 +25,8 @@ export interface LoyaltyCheckinRequest {
   status?: "active";
   member: LoyaltyMember;
   rewards: {
-    items: Array<LoyaltyRewardItem>;
-    surcounts: Array<Surcounts>;
+    items: Array<Product>;
+    surcounts: Array<Surcount>;
   };
 }
 
@@ -99,8 +54,8 @@ export interface LoyaltyMemberActivityRequest {
   pointsBalance: number;
   message: string;
   rewards: {
-    items: Array<LoyaltyRewardItem>;
-    surcounts: Array<Surcounts>;
+    items: Array<Product>;
+    surcounts: Array<Surcount>;
   };
 }
 
@@ -112,8 +67,8 @@ export interface LoyaltyMemberActivityResponse {
   memberRef: string;
   orderId: string;
   rewards: {
-    items: Array<LoyaltyRewardItem>;
-    surcounts: Array<Surcounts>;
+    items: Array<Product>;
+    surcounts: Array<Surcount>;
   };
   rejectionReason: string;
   createdAt: string;

@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Surcounts } from "./sharedSchema";
+import { Surcount } from "./sharedSchema";
 
 interface MenuAltNames {
   default: {
@@ -80,14 +80,14 @@ export interface MenuProduct {
     }>;
   }>;
   options: Array<MenuOptions>;
-  surcounts: Array<Surcounts>;
+  surcounts: Array<Surcount>;
   alternateNames: MenuAltNames;
   imageUri: string;
 }
 export interface MenuResponse {
   description: string;
   imageUri: string;
-  surcounts: Array<Surcounts>;
+  surcounts: Array<Surcount>;
   options: Array<MenuOptions>;
   products: Array<MenuProduct>;
   updatedAt: string;
@@ -192,7 +192,7 @@ export default class Menu {
     options?: {
       filtered: boolean;
     }
-  ): Promise<Surcounts> {
+  ): Promise<Surcount> {
     return await this.requestMaker({
       url: `/locations/${locationId}/menu/surcounts/${posId}`,
       method: "GET",
