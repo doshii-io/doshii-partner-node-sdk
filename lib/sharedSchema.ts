@@ -38,6 +38,15 @@ export interface LogsResponse {
   performedAt: string;
 }
 
+export interface LogsRequest {
+  employeeId: number;
+  employeeName: string;
+  employeePosRef: string;
+  deviceRef: string;
+  deviceName: string;
+  area: string;
+}
+
 export type LocationClasses =
   | "Accommodation"
   | "Amateur Sport"
@@ -68,8 +77,8 @@ export interface ProductOptions {
 }
 
 export interface Product {
-  rewardRef: string;
-  uuid: string;
+  rewardRef?: string;
+  uuid?: string;
   posId: string;
   name: string;
   quantity: number;

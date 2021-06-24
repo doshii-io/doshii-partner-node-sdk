@@ -59,6 +59,11 @@ export default class Booking {
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param bookingId ID of the booking to retrieve, if not provided all the bookings
    * in the location are retrived
+   * @param filters Optional filters used to retrieve the bookings
+   *  from: A Unix timestamp (seconds) that bookings were created at or later than
+   *  to: A Unix timestamp (seconds) that bookings were created at or before than
+   *  offset: Number of matching records to skip before returning the matches, default is 0
+   *  limit: Max number of records to return, default is 50, max is 250
    * @returns bookings for a location
    */
   async get(
@@ -93,6 +98,11 @@ export default class Booking {
   /**
    * Retrieve all Bookings for a Location
    * @param locationId The hashed Location ID of the location you are interacting with
+   * @param filters Optional filters used to retrieve the bookings
+   *  from: A Unix timestamp (seconds) that bookings were created at or later than
+   *  to: A Unix timestamp (seconds) that bookings were created at or before than
+   *  offset: Number of matching records to skip before returning the matches, default is 0
+   *  limit: Max number of records to return, default is 50, max is 250
    * @returns bookings for a location
    */
 
@@ -145,11 +155,18 @@ export default class Booking {
    * Retrieve all preorders against a Booking
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param bookingId ID of the booking to retrieve
+   * @param filters Optional filters used to retrieve the bookings
+   *  offset: Number of matching records to skip before returning the matches, default is 0
+   *  limit: Max number of records to return, default is 50, max is 250
    * @returns The preorders associated to the booking
    */
   async getPreorders(
     locationId: string,
-    bookingId: string
+    bookingId: string,
+    filters?: {
+      offset?: number;
+      limit?: number;
+    }
   ): Promise<OrderResponses> {
     return await this.requestMaker({
       url: `/bookings/${bookingId}/preorders`,
@@ -157,6 +174,7 @@ export default class Booking {
       headers: {
         "doshii-location-id": locationId,
       },
+      params: filters,
     });
   }
 

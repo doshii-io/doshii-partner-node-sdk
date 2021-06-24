@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 import {
   sampleOrderResponse,
-  sampleBookingResposes,
+  sampleBookingResponses,
   sampleCheckinResponse,
 } from "./sharedSamples";
 
@@ -109,11 +109,11 @@ describe("Location", () => {
   test("Should request for table bookings with or without filters", async () => {
     const requestSpy = jest
       .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleBookingResposes });
+      .mockResolvedValue({ status: 200, data: sampleBookingResponses });
     const tableName = "table1";
     await expect(
       doshii.table.getBookings(locationId, tableName)
-    ).resolves.toMatchObject(sampleBookingResposes);
+    ).resolves.toMatchObject(sampleBookingResponses);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -130,7 +130,7 @@ describe("Location", () => {
         status: BookingStatus.ACCEPTED,
         seated: false,
       })
-    ).resolves.toMatchObject(sampleBookingResposes);
+    ).resolves.toMatchObject(sampleBookingResponses);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,

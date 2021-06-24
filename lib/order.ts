@@ -1,6 +1,12 @@
 import { AxiosRequestConfig } from "axios";
 import { CheckinResponse } from "./checkin";
-import { Consumer, LogsResponse, Product, Surcount } from "./sharedSchema";
+import {
+  Consumer,
+  LogsRequest,
+  LogsResponse,
+  Product,
+  Surcount,
+} from "./sharedSchema";
 import { TransactionRequest, TransactionResponse } from "./transaction";
 
 export enum OrderStatus {
@@ -116,9 +122,9 @@ export interface OrderResponses {
 export interface OrderPreprocess {
   checkinId: string;
   externalOrderRef: string;
-  manuallyProcesssed: string;
+  manuallyProcessed: boolean;
   status: OrderStatus;
-  type: "delivery" | " pickup" | " dinein ";
+  type: "delivery" | "pickup" | "dinein ";
   revenueCentre: string;
   notes: string;
   requiredAt: string;
@@ -126,7 +132,7 @@ export interface OrderPreprocess {
   items: Array<ProductWithTaxes>;
   surcounts: Array<Surcount>;
   taxes: Array<Tax>;
-  log: LogsResponse;
+  log: LogsRequest;
 }
 export interface OrderRequest {
   order: OrderPreprocess;
