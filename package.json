@@ -35,5 +35,17 @@
     "jsonwebtoken": "^8.5.1",
     "tslib": "^2.3.0",
     "ws": "^7.4.6"
+  },
+  "jest": {
+    "testMatch": [
+      "**/tests/*.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "dist"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    }
   }
 }

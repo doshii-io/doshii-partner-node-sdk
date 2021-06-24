@@ -87,7 +87,7 @@ export default class Table {
    */
   async getAll(
     locationId: string,
-    filters: {
+    filters?: {
       id?: Array<string>;
       isActive?: boolean;
       covers?: string;
@@ -102,13 +102,13 @@ export default class Table {
    * Retrieve a list of all Bookings that apply to a Table by the Tables' name
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param name The name of the table you'd like to retrieve bookings for
-   * @param options Optional filters
+   * @param filters Optional filters
    * @returns A list of reservations for the supplied table
    */
   async getBookings(
     locationId: string,
     name: string,
-    options?: {
+    filters?: {
       status?: BookingStatus;
       seated?: boolean;
     }
@@ -119,7 +119,7 @@ export default class Table {
       headers: {
         "doshii-location-id": locationId,
       },
-      params: options,
+      params: filters,
     });
   }
   /**
@@ -150,7 +150,7 @@ export default class Table {
   async getOrders(
     locationId: string,
     name: string,
-    options?: {
+    filters?: {
       status: OrderStatus;
     }
   ): Promise<Array<OrderResponse>> {
@@ -160,7 +160,7 @@ export default class Table {
       headers: {
         "doshii-location-id": locationId,
       },
-      params: options,
+      params: filters,
     });
   }
 }
