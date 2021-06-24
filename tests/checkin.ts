@@ -1,6 +1,11 @@
 import Doshii from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
+import {
+  sampleCheckinRequest,
+  sampleCheckinResponse,
+  sampleOrderResponse,
+} from "./sharedSamples";
 
 jest.mock("axios");
 jest.mock("jsonwebtoken");
@@ -12,19 +17,20 @@ describe("Booking", () => {
   const checkinId = "chekc34idje9";
   const clientSecret = "su234perDu[erse-898cret-09";
   let authSpy: jest.SpyInstance;
-  let requestSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, "", true);
     authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
-    requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: "success" });
   });
 
-  test("Should request for checkins", async () => {
-    await expect(doshii.checkin.get(locationId)).resolves.toBeDefined();
+  test("Should request for all checkins with or without filters", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
+    await expect(doshii.checkin.getAll(locationId)).resolves.toMatchObject([
+      sampleCheckinResponse,
+    ]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -35,9 +41,17 @@ describe("Booking", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/checkins",
     });
+
+    expect(authSpy).toBeCalledTimes(1);
+  });
+
+  test("Should request for a specific checkin", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleCheckinResponse });
     await expect(
-      doshii.checkin.get(locationId, checkinId)
-    ).resolves.toBeDefined();
+      doshii.checkin.getOne(locationId, checkinId)
+    ).resolves.toMatchObject(sampleCheckinResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -48,10 +62,13 @@ describe("Booking", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/checkins/${checkinId}`,
     });
-    expect(authSpy).toBeCalledTimes(2);
+    expect(authSpy).toBeCalledTimes(1);
   });
 
-  test("Should pass on the options as params for retrieving checkins", async () => {
+  test("Should pass on the filters as params for retrieving checkins", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
     await expect(
       doshii.checkin.get(locationId, "", {
         from: new Date("01-01-2021"),
@@ -61,7 +78,7 @@ describe("Booking", () => {
         offset: 2,
         limit: 100,
       })
-    ).resolves.toBeDefined();
+    ).resolves.toMatchObject([sampleCheckinResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -90,9 +107,12 @@ describe("Booking", () => {
   });
 
   test("Should request for checkin orders", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleOrderResponse] });
     await expect(
       doshii.checkin.getOrders(locationId, checkinId)
-    ).resolves.toBeDefined();
+    ).resolves.toMatchObject([sampleOrderResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -106,10 +126,12 @@ describe("Booking", () => {
   });
 
   test("Should request new checkin", async () => {
-    const data = { checkin: "checkin data" };
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleCheckinResponse });
     await expect(
-      doshii.checkin.create(locationId, data)
-    ).resolves.toBeDefined();
+      doshii.checkin.create(locationId, sampleCheckinRequest)
+    ).resolves.toMatchObject(sampleCheckinResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
@@ -119,14 +141,16 @@ describe("Booking", () => {
       method: "POST",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/checkins`,
-      data,
+      data: sampleCheckinRequest,
     });
   });
 
   test("Should request for checkin update", async () => {
-    const data = { checkin: "checkin update data" };
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleCheckinResponse });
     await expect(
-      doshii.checkin.update(locationId, checkinId, data)
+      doshii.checkin.update(locationId, checkinId, sampleCheckinRequest)
     ).resolves.toBeDefined();
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -137,7 +161,7 @@ describe("Booking", () => {
       method: "PUT",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/checkins/${checkinId}`,
-      data,
+      data: sampleCheckinRequest,
     });
   });
 });
