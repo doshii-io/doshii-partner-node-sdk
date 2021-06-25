@@ -954,3 +954,60 @@ export const sampleLogsResponse = {
   ],
   performedAt: "2019-01-01T12:00:00.000Z",
 };
+
+export const sampleTransactionRequest = {
+  amount: 2500,
+  reference: "123",
+  invoice: "123",
+  linkedTrxId: "123",
+  method: "cash",
+  tip: 500,
+  trn: "100412786589",
+  prepaid: true,
+  surcounts: [
+    {
+      posId: "123",
+      name: "Item name",
+      description: "Item description",
+      amount: 1000,
+      type: "absolute",
+      value: "1000",
+    },
+  ],
+};
+
+export const sampleTransactionResponse = {
+  id: "124",
+  orderId: "112",
+  reference: "23ad34-45623f-768",
+  invoice: "INV2245",
+  method: "mastercard",
+  amount: "1000",
+  tip: 0,
+  trn: "100412786589",
+  acceptLess: false,
+  partnerInitiated: true,
+  prepaid: true,
+  rejectionCode: "P1",
+  rejectionReason: "Insufficient funds",
+  version: "AJHBFjAKJFE3fnj33njj",
+  surcount: [
+    {
+      posId: "123",
+      name: "Item name",
+      description: "Item description",
+      amount: 1000,
+      type: "absolute",
+      value: "1000",
+    },
+  ],
+  updatedAt: "2019-01-01T12:00:00.000Z",
+  createdAt: "2019-01-01T12:00:00.000Z",
+  uri: "https://sandbox.doshii.co/partner/v3/transactions/124",
+  status: "requested",
+  linkedTrxId: "123",
+  createdByApp: "123",
+  processedByApp: "6",
+  posTerminalId: "123",
+  requestedAppId: "123",
+};

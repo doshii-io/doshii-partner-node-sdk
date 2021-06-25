@@ -11,6 +11,9 @@ import Order, {
   OrderPreprocess,
   OrderResponses,
   OrderRequest,
+  MealPhase,
+  DeliveryStatus,
+  AddItemToOrderRequest,
 } from "./order";
 import Device, { DeviceResponse, DeviceRegister, DeviceUpdate } from "./device";
 import Transaction, {
@@ -525,4 +528,7 @@ export {
   CheckinRetrievalFilters,
   CheckinRequest,
   CheckinResponse,
+  MealPhase,
+  DeliveryStatus,
+  AddItemToOrderRequest,
 };

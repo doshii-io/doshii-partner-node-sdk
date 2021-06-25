@@ -29,28 +29,35 @@ type Tax = {
 interface ProductWithTaxes extends Product {
   taxes: Array<Tax>;
 }
-interface AddItemsRequest
+export interface AddItemToOrderRequest
   extends Omit<ProductWithTaxes, "uuid" | "rewardRef"> {}
 
-type MealPhase =
-  | "ordered"
-  | " delayed"
-  | " appetiser_preparing"
-  | " entree_preparing"
-  | " main_preparing"
-  | " dessert_preparing"
-  | " appetiser_prepared"
-  | " entree_prepared"
-  | " main_prepared"
-  | " dessert_prepared"
-  | " appetiser_served"
-  | " entree_served"
-  | " main_served"
-  | " dessert_served"
-  | " billed"
-  | " fulfilled"
-  | " delivering"
-  | " delivered ";
+export enum MealPhase {
+  ORDERED = "Ordered",
+  DELAYED = "Delayed",
+  APPETISER_PREPARING = "appetiser_preparing",
+  ENTREE_PREPARING = "entree_preparing",
+  MAIN_PREPARING = "main_preparing",
+  DESSERT_PREPARING = "dessert_preparing",
+  APPETISER_PREPARED = "appetiser_prepared",
+  ENTREE_PREPARED = "entree_prepared",
+  MAIN_PREPARED = "main_prepared",
+  DESSERT_PREPARED = "dessert_prepared",
+  APPETISER_SERVED = "appetiser_prepared",
+  ENTREE_SERVED = "entree_served",
+  MAIN_SERVED = "main_served",
+  DESSERT_SERVED = "dessert_served",
+  BILLED = "billed",
+  FULFILLED = "fulfilled",
+  DELIVERING = "delivering",
+  DELIVERED = "delivered",
+}
+
+export enum DeliveryStatus {
+  DELIVERING = "delivering",
+  DELIVERED = "delivered",
+  FAILED = "failed",
+}
 export interface OrderResponse {
   id: string;
   posRef: string;
@@ -90,7 +97,7 @@ export interface OrderResponse {
     | " MAR3"
     | " POSSIE";
   delivery: {
-    status: "delivering" | " delivered" | " failed";
+    status: DeliveryStatus;
     displayId: string;
     phase?: string;
     failedReason: string;
@@ -118,7 +125,6 @@ export interface OrderResponses {
   limit: number;
   rows: Array<OrderResponse>;
 }
-
 export interface OrderPreprocess {
   checkinId: string;
   externalOrderRef: string;
@@ -288,7 +294,7 @@ export default class Order {
       status: OrderStatus;
       mealPhase: MealPhase;
       version: string;
-      log: LogsResponse;
+      log: LogsRequest;
     }
   ): Promise<OrderResponse> {
     return await this.requestMaker({
@@ -313,7 +319,7 @@ export default class Order {
     orderId: string,
     data: {
       deliveryOrderId?: string;
-      status?: "delivering" | " delivered" | " failed";
+      status?: DeliveryStatus;
       displayId?: string;
       phase?: string;
       failedReason: string;
@@ -360,7 +366,7 @@ export default class Order {
   async addItems(
     locationId: string,
     orderId: string,
-    data: AddItemsRequest
+    data: Array<AddItemToOrderRequest>
   ): Promise<OrderResponse> {
     return await this.requestMaker({
       url: `/orders/${orderId}/items`,
@@ -386,7 +392,7 @@ export default class Order {
     data: {
       cancelledItems: Array<string>;
       version: string;
-      log: LogsResponse;
+      log: LogsRequest;
     }
   ): Promise<OrderResponse> {
     return await this.requestMaker({

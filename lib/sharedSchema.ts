@@ -48,23 +48,23 @@ export interface LogsRequest {
   area: string;
 }
 
-export type LocationClasses =
-  | "Accommodation"
-  | "Amateur Sport"
-  | "Bakery"
-  | "Bar"
-  | "Café"
-  | "Cinema"
-  | "Club"
-  | "Education"
-  | "Golf Club"
-  | "Gym"
-  | "Pub"
-  | "QSR"
-  | "Restaurant"
-  | "Takeaway Food"
-  | "Test";
-
+export enum LocationClasses {
+  ACCOMODATION = "Accomodation",
+  AMATEUR_SPORT = "Amateur Sport",
+  BAKERY = "Bakery",
+  BAR = "Bar",
+  CAFE = "Café",
+  CINEMA = "Cinema",
+  CLUB = "Club",
+  EDUCATION = "Education",
+  GOLF_CLUB = "Golf Club",
+  GYM = "Gym",
+  PUB = "Pub",
+  QSR = "QSR",
+  RESTAURANT = "Restaurant",
+  TAKEAWAY_FOOD = "Takeaway Food",
+  TEST = "Test",
+}
 export interface ProductOptions {
   posId: string;
   name: string;
