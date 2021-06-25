@@ -36,6 +36,18 @@ export interface CheckinRequest {
   consumer: Consumer;
 }
 
+export interface CheckinRetrievalFilters {
+  status?: "pending" | "accepted";
+  tableName?: string;
+  from?: Date;
+  to?: Date;
+  updatedFrom?: Date;
+  updatedTo?: Date;
+  offset?: number;
+  limit?: number;
+  sort?: "asc" | "desc";
+}
+
 export default class Checkin {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
 
@@ -50,6 +62,8 @@ export default class Checkin {
    * @param checkinId The ID of the checkin you'd like to retrieve, if not provided
    * all checkins in the location are retrieved
    * @param filters Optional filters
+   *    status: String to return active or completed checkins, default is 'pending, accepted'
+   *    tableName: Single table name
    *    from: Minimum checkin creation date and time (in Epoch-time), default is 60 mins ago
    *    to: Maximum checkin creation date and time (in Epoch-time), default is 60 mins ahead
    *    updatedFrom: Minimum checkin update date and time (in Epoch-time), no default
@@ -61,14 +75,7 @@ export default class Checkin {
   async get(
     locationId: string,
     checkinId?: string,
-    filters?: {
-      from?: Date;
-      to?: Date;
-      updatedFrom?: Date;
-      updatedTo?: Date;
-      offset?: number;
-      limit?: number;
-    }
+    filters?: CheckinRetrievalFilters
   ): Promise<CheckinResponse | Array<CheckinResponse>> {
     let req: AxiosRequestConfig = {
       method: "GET",
@@ -105,6 +112,8 @@ export default class Checkin {
    * Retrieve Checkins for a Location
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param options Optional filters
+   *    status: String to return active or completed checkins, default is 'pending, accepted'
+   *    tableName: Single table name
    *    from: Minimum checkin creation date and time (in Epoch-time), default is 60 mins ago
    *    to: Maximum checkin creation date and time (in Epoch-time), default is 60 mins ahead
    *    updatedFrom: Minimum checkin update date and time (in Epoch-time), no default
@@ -115,14 +124,7 @@ export default class Checkin {
    */
   async getAll(
     locationId: string,
-    filters?: {
-      from?: Date;
-      to?: Date;
-      updatedFrom?: Date;
-      updatedTo?: Date;
-      offset?: number;
-      limit?: number;
-    }
+    filters?: CheckinRetrievalFilters
   ): Promise<Array<CheckinResponse>> {
     return this.get(locationId, undefined, filters) as Promise<
       Array<CheckinResponse>

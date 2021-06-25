@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import { LocationClasses } from "./sharedSchema";
 
-export type LocationResponse = {
+export interface LocationResponse {
   id: string;
   name: string;
   addressLine1: string | null;
@@ -55,9 +55,9 @@ export type LocationResponse = {
     autoCompleteCheckin: boolean;
   };
   imageUri?: string;
-};
+}
 
-export type LocationHealth = {
+export interface LocationHealth {
   locationId: string;
   name: string;
   communicationType: "websockets" | "webhooks";
@@ -71,9 +71,9 @@ export type LocationHealth = {
     delivery: number;
   };
   locationUri: string;
-};
+}
 
-export type LocationTerminal = {
+export interface LocationTerminal {
   doshiiId: string;
   name: string;
   ref: string;
@@ -83,7 +83,13 @@ export type LocationTerminal = {
   updatedAt: string;
   createdAt: string;
   uri: string;
-};
+}
+
+export interface LocationHealthRetrievalFilters {
+  since?: Date;
+  inverse?: boolean;
+  sort?: "asc" | "desc";
+}
 
 /**
  * Location API
@@ -150,11 +156,7 @@ export default class Location {
    */
   async getHealth(
     locationId?: string,
-    filters?: {
-      since?: Date;
-      inverse?: boolean;
-      sort?: "asc" | "desc";
-    }
+    filters?: LocationHealthRetrievalFilters
   ): Promise<Array<LocationHealth> | LocationHealth> {
     let requestData: AxiosRequestConfig = {
       method: "GET",
@@ -199,11 +201,9 @@ export default class Location {
    *  sort: Sort locations ascending or descending based on last heartbeat date. Default is desc.
    * @returns location health details
    */
-  async getAllHealths(filters?: {
-    since?: Date;
-    inverse?: boolean;
-    sort?: "asc" | "desc";
-  }): Promise<Array<LocationHealth>> {
+  async getAllHealths(
+    filters?: LocationHealthRetrievalFilters
+  ): Promise<Array<LocationHealth>> {
     return this.getHealth(undefined, filters) as Promise<Array<LocationHealth>>;
   }
 

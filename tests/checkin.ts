@@ -24,7 +24,7 @@ describe("Booking", () => {
     authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
   });
 
-  test("Should request for all checkins with or without filters", async () => {
+  test("Should request for all checkins", async () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });

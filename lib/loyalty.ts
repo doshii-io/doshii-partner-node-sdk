@@ -121,6 +121,14 @@ export interface LoyaltyCardRequest {
   };
 }
 
+export interface LoyaltyCheckinRetrievalFilters {
+  from?: Date;
+  to?: Date;
+  offset?: number;
+  limit?: number;
+  sort?: "asc" | "desc";
+}
+
 export default class Loyalty {
   readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
 
@@ -143,13 +151,7 @@ export default class Loyalty {
   async getCheckins(
     locationId: string,
     checkInId?: string,
-    filters?: {
-      from?: Date;
-      to?: Date;
-      offset?: number;
-      limit?: number;
-      sort?: "asc" | "desc";
-    }
+    filters?: LoyaltyCheckinRetrievalFilters
   ): Promise<Array<LoyaltyCheckinResponse> | LoyaltyCheckinResponse> {
     let req: AxiosRequestConfig = {
       method: "GET",

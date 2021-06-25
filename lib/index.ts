@@ -35,8 +35,13 @@ import Loyalty, {
   LoyaltyMemberEnquiryRequest,
   LoyaltyCheckinResponse,
   LoyaltyCheckinRequest,
+  LoyaltyCheckinRetrievalFilters,
 } from "./loyalty";
-import Checkin from "./checkin";
+import Checkin, {
+  CheckinRetrievalFilters,
+  CheckinRequest,
+  CheckinResponse,
+} from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
 import { LocationClasses, Product, LogsResponse } from "./sharedSchema";
@@ -511,9 +516,13 @@ export {
   LoyaltyMemberEnquiryRequest,
   LoyaltyCheckinResponse,
   LoyaltyCheckinRequest,
+  LoyaltyCheckinRetrievalFilters,
   Product,
   OrderResponse,
   OrderPreprocess,
   OrderResponses,
   OrderRequest,
+  CheckinRetrievalFilters,
+  CheckinRequest,
+  CheckinResponse,
 };

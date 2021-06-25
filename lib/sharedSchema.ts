@@ -5,6 +5,7 @@ export interface Surcount {
   amount: number;
   type: "absolute" | "percentage";
   value: string;
+  rewardRef?: string;
 }
 
 export interface Consumer {
