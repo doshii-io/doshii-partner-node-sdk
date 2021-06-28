@@ -5,7 +5,7 @@ import { sampleTransactionResponse, sampleLogsResponse } from "./sharedSamples";
 jest.mock("axios");
 jest.mock("jsonwebtoken");
 
-describe("Location", () => {
+describe("Transaction", () => {
   let doshii: Doshii;
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";

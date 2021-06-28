@@ -10,7 +10,7 @@ import {
 jest.mock("axios");
 jest.mock("jsonwebtoken");
 
-describe("Booking", () => {
+describe("Check in", () => {
   let doshii: Doshii;
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";

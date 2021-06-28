@@ -27,7 +27,7 @@ const sampleTableResponse = {
   uri: "https://sandbox.doshii.co/partner/v3/tables/table1",
 };
 
-describe("Location", () => {
+describe("Table", () => {
   let doshii: Doshii;
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";

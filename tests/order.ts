@@ -192,7 +192,7 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
   },
 };
 
-describe("Location", () => {
+describe("Order", () => {
   let doshii: Doshii;
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";

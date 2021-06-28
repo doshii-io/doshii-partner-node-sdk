@@ -550,7 +550,7 @@ const sampleMenuOption = {
   },
 };
 
-describe("Location", () => {
+describe("Menu", () => {
   let doshii: Doshii;
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";

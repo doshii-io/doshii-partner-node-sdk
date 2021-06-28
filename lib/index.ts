@@ -116,6 +116,12 @@ export interface DataAggregationStatusResponse {
   };
 }
 
+export interface RejectionCodeResponse {
+  code: string;
+  description: string;
+  entity: string;
+}
+
 export default class Doshii {
   private readonly clientId: string;
   private readonly clientSecret: string;
@@ -422,7 +428,9 @@ export default class Doshii {
    * Retrieve all rejection codes
    * @returns List of all rejection codes
    */
-  async getRejectionCodes(code: string) {
+  async getRejectionCodes(
+    code?: string
+  ): Promise<Array<RejectionCodeResponse> | RejectionCodeResponse> {
     return this.submitRequest({
       url: code ? `/rejection_codes/${code}` : "/rejection_codes",
       method: "GET",
@@ -433,6 +441,7 @@ export default class Doshii {
    *
    * Submit an asynchronous data aggregation request.
    * @param dataset The dataset that was requested to be aggregated. Current supported value is orders.
+   * @param data Request body
    * @param appId required if not provided during class instantiation else not required
    * @returns The registered bulk data request
    */
