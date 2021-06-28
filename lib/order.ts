@@ -148,7 +148,7 @@ export interface OrderRequest {
   posTerminalId: string;
 }
 
-export type OrderRetrievalFilters = {
+export interface OrderRetrievalFilters {
   /**Comma separated list of statuses.
    * Defaults to accepting all. eg. pending,accepted. */
   status?: Array<OrderStatus>;
@@ -182,7 +182,7 @@ export type OrderRetrievalFilters = {
    * (e.g. Accept-Encoding: gzip) then the Default becomes 200,
    * with a maximum supported limit of 1,000 records. */
   limit?: number;
-};
+}
 
 export default class Order {
   private readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
