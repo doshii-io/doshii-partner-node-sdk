@@ -82,7 +82,7 @@ export interface DataAggregationRequest {
   doshiiId: string;
   webhook: {
     url: string;
-    headers: { string: any };
+    headers: any;
   };
   mimeType: string;
   fileSize: number;
@@ -153,15 +153,21 @@ export default class Doshii {
   constructor(
     clientId: string,
     clientSecret: string,
-    appId?: string,
-    sandbox = false,
-    apiVersion = 3,
-    logLevel = LogLevel.WARN
+    options?: {
+      appId?: string;
+      sandbox?: boolean;
+      apiVersion?: number;
+      logLevel?: LogLevel.WARN;
+    }
   ) {
-    this.logger = new Logger(logLevel);
+    this.logger = options?.logLevel
+      ? new Logger(options.logLevel)
+      : new Logger(LogLevel.WARN);
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.url = sandbox
+    const apiVersion = options?.apiVersion ? options.apiVersion : 3;
+    this.sandbox = options?.sandbox ? options.sandbox : false;
+    this.url = this.sandbox
       ? `https://sandbox.doshii.co/partner/v${apiVersion}`
       : `https://live.doshii.co/partner/v${apiVersion}`;
 
@@ -176,10 +182,8 @@ export default class Doshii {
     this.loyalty = new Loyalty(this.submitRequest.bind(this));
     this.checkin = new Checkin(this.submitRequest.bind(this));
 
-    this.sandbox = sandbox;
-
-    if (appId) {
-      this.generateApiKey(appId);
+    if (options?.appId) {
+      this.generateApiKey(options.appId);
     }
   }
 
@@ -513,6 +517,7 @@ export {
   DeviceUpdate,
   DeviceResponse,
   LocationResponse,
+  LocationClasses,
   WebhookResponse,
   WebhookRegister,
   TransactionResponse,

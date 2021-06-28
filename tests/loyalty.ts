@@ -391,7 +391,7 @@ describe("Loyalty", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    doshii = new Doshii(clientId, clientSecret, "", true);
+    doshii = new Doshii(clientId, clientSecret, { sandbox: true });
     authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
   });
 
