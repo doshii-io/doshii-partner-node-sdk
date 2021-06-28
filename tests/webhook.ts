@@ -31,7 +31,9 @@ describe("Webhook", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleResponse] });
-    await expect(doshii.webhook.get()).resolves.toMatchObject([sampleResponse]);
+    await expect(doshii.webhook.getAll()).resolves.toMatchObject([
+      sampleResponse,
+    ]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
@@ -49,7 +51,7 @@ describe("Webhook", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleResponse });
     await expect(
-      doshii.webhook.get(DoshiiEvents.BOOKING_CREATED)
+      doshii.webhook.getOne(DoshiiEvents.BOOKING_CREATED)
     ).resolves.toMatchObject(sampleResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {

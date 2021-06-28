@@ -41,8 +41,9 @@
       "**/tests/*.ts"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "dist"
+      "node_modules/",
+      "dist",
+      "tests/sharedSamples.ts"
     ],
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest"

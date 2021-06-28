@@ -125,11 +125,12 @@ describe("Location", () => {
       url: `/tables/${tableName}/bookings`,
     });
 
+    const filters = {
+      status: BookingStatus.ACCEPTED,
+      seated: false,
+    };
     await expect(
-      doshii.table.getBookings(locationId, tableName, {
-        status: BookingStatus.ACCEPTED,
-        seated: false,
-      })
+      doshii.table.getBookings(locationId, tableName, filters)
     ).resolves.toMatchObject(sampleBookingResponses);
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -140,10 +141,7 @@ describe("Location", () => {
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/tables/${tableName}/bookings`,
-      params: {
-        status: BookingStatus.ACCEPTED,
-        seated: false,
-      },
+      params: filters,
     });
   });
 
@@ -186,10 +184,11 @@ describe("Location", () => {
       url: `/tables/${tableName}/orders`,
     });
 
+    const filters = {
+      status: OrderStatus.PENDING,
+    };
     await expect(
-      doshii.table.getOrders(locationId, tableName, {
-        status: OrderStatus.PENDING,
-      })
+      doshii.table.getOrders(locationId, tableName, filters)
     ).resolves.toMatchObject([sampleOrderResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -200,9 +199,7 @@ describe("Location", () => {
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/tables/${tableName}/orders`,
-      params: {
-        status: "pending",
-      },
+      params: filters,
     });
   });
 });

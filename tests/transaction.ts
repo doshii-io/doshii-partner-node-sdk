@@ -1,63 +1,9 @@
 import Doshii, { TransactionRequest, TransactionUpdate } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-
+import { sampleTransactionResponse, sampleLogsResponse } from "./sharedSamples";
 jest.mock("axios");
 jest.mock("jsonwebtoken");
-
-const sampleTransactionResponse = {
-  id: "124",
-  orderId: "112",
-  reference: "23ad34-45623f-768",
-  invoice: "INV2245",
-  method: "mastercard",
-  amount: "1000",
-  tip: 0,
-  trn: "100412786589",
-  acceptLess: false,
-  partnerInitiated: true,
-  prepaid: true,
-  rejectionCode: "P1",
-  rejectionReason: "Insufficient funds",
-  version: "AJHBFjAKJFE3fnj33njj",
-  surcount: [
-    {
-      posId: "123",
-      name: "Item name",
-      description: "Item description",
-      amount: 1000,
-      type: "absolute",
-      value: "1000",
-    },
-  ],
-  updatedAt: "2019-01-01T12:00:00.000Z",
-  createdAt: "2019-01-01T12:00:00.000Z",
-  uri: "https://sandbox.doshii.co/partner/v3/transactions/124",
-  status: "requested",
-  linkedTrxId: "123",
-  createdByApp: "123",
-  processedByApp: "6",
-  posTerminalId: "123",
-  requestedAppId: "123",
-};
-
-const sampleTransactionLogsResponse = {
-  logId: "f52e2b12-9b13-4113-bb49-3cfacad02545",
-  employeeId: "1",
-  employeeName: "Fred Bloggs",
-  employeePosRef: "432324tgr",
-  deviceRef: "213-iPad",
-  deviceName: "Dining Room iPad 1",
-  area: "Dining Room",
-  appId: "12",
-  appName: "Fred's Cool Ordering App",
-  audit: "accepted => complete",
-  action: [
-    "Item ID (bd9e565a-affe-4f7d-9dc6-728151647af0) item_created",
-    "order_updated",
-  ],
-  performedAt: "2019-01-01T12:00:00.000Z",
-};
 
 describe("Location", () => {
   let doshii: Doshii;
@@ -116,11 +62,11 @@ describe("Location", () => {
     const transactionId = "transactionI34";
     const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
       status: 200,
-      data: [sampleTransactionLogsResponse],
+      data: [sampleLogsResponse],
     });
     await expect(
       doshii.transaction.getLogs(locationId, transactionId)
-    ).resolves.toMatchObject([sampleTransactionLogsResponse]);
+    ).resolves.toMatchObject([sampleLogsResponse]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
