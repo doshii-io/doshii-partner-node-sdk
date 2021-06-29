@@ -128,6 +128,7 @@ export default class Doshii {
   private readonly sandbox: boolean;
   private readonly url: string;
   private readonly logger: Logger;
+  private readonly pingInterval: number = 30000;
 
   private apiKey = "";
 
@@ -157,7 +158,8 @@ export default class Doshii {
       appId?: string;
       sandbox?: boolean;
       apiVersion?: number;
-      logLevel?: LogLevel.WARN;
+      logLevel?: LogLevel;
+      pingInterval?: number;
     }
   ) {
     this.logger = options?.logLevel
@@ -182,9 +184,9 @@ export default class Doshii {
     this.loyalty = new Loyalty(this.submitRequest.bind(this));
     this.checkin = new Checkin(this.submitRequest.bind(this));
 
-    if (options?.appId) {
-      this.generateApiKey(options.appId);
-    }
+    if (options?.appId) this.generateApiKey(options.appId);
+
+    if (options?.pingInterval) this.pingInterval = options.pingInterval;
   }
 
   private generateApiKey(appId: string) {
@@ -225,7 +227,7 @@ export default class Doshii {
     this.websocket = new WebSocket(wsUrl + auth);
 
     // send pings every 30s and on open
-    this.websocket.onopen = () => {
+    this.websocket.on("open", () => {
       this.logger.debug("Doshii: Opened websocket");
       const ping = (autoClose: boolean = false) => {
         if (autoClose && this.subscribers.size < 1) {
@@ -250,25 +252,25 @@ export default class Doshii {
       // Send one immediately to complete the handshake
       ping();
       // Then 30 every seconds or so thereafter to keep alive
-      const heartbeat = setInterval(ping, 30000, true);
-    };
+      const heartbeat = setInterval(ping, this.pingInterval, true);
+    });
 
-    this.websocket.onmessage = (event: any) => {
+    this.websocket.on("message", (event: any) => {
       this.onWebsocketMessage(event);
-    };
+    });
 
-    this.websocket.onerror = (event: any) => {
+    this.websocket.on("error", (event: any) => {
       this.onWebsocketError(event);
-    };
+    });
 
-    this.websocket.onclose = () => {
+    this.websocket.on("close", () => {
       this.onWebsocketClose();
-    };
+    });
   }
 
   private onWebsocketMessage(event: any) {
     this.logger.debug("Doshii: Recieved message from websocket");
-    const eventData = JSON.parse(event.data);
+    const eventData = JSON.parse(event);
     if (eventData?.doshii?.pong) {
       this.logger.debug("Doshii: Got pong");
       this.notifySubscribers(WebSocketEvents.PONG, eventData);

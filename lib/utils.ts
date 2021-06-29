@@ -1,5 +1,5 @@
 export enum LogLevel {
-  DEBUG,
+  DEBUG = 1,
   INFO,
   WARN,
   ERROR,
@@ -8,8 +8,8 @@ export enum LogLevel {
 export class Logger {
   private readonly logLevel: LogLevel;
 
-  constructor(level = LogLevel.ERROR) {
-    this.logLevel = level;
+  constructor(level?: LogLevel) {
+    this.logLevel = level ? level : LogLevel.WARN;
   }
 
   debug(msg: any) {
