@@ -72,8 +72,8 @@ describe("Booking", () => {
     });
     // with filters
     const filters = {
-      from: new Date("2020-02-21"),
-      to: new Date("2021-02-21"),
+      from: new Date(Date.UTC(2021, 0, 1)),
+      to: new Date(Date.UTC(2021, 0, 2)),
       offset: 4,
       limit: 3,
     };
@@ -89,7 +89,12 @@ describe("Booking", () => {
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/bookings",
-      params: filters,
+      params: {
+        from: 1609459200,
+        to: 1609545600,
+        offset: 4,
+        limit: 3,
+      },
     });
 
     expect(authSpy).toBeCalledTimes(2);

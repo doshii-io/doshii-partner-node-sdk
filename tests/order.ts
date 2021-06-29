@@ -255,9 +255,10 @@ describe("Order", () => {
         status: [OrderStatus.PENDING, OrderStatus.ACCEPTED],
         posRef: "pos234",
         externalOrderRef: "order234",
-        posFrom: new Date("01-01-2021"),
-        from: new Date("01-01-2021"),
-        to: new Date("01-02-2021"),
+        from: new Date(Date.UTC(2021, 0, 1)),
+        posFrom: new Date(Date.UTC(2021, 0, 1)),
+        to: new Date(Date.UTC(2021, 0, 2)),
+        posTo: new Date(Date.UTC(2021, 0, 2)),
         sort: "asc",
       })
     ).resolves.toMatchObject(sampleOrderResponses);
@@ -271,13 +272,14 @@ describe("Order", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/orders",
       params: {
+        from: 1609459200,
+        to: 1609545600,
+        posFrom: 1609459200,
+        posTo: 1609545600,
         sort: "asc",
         posRef: "pos234",
         externalOrderRef: "order234",
-        from: 1609419600,
-        posFrom: 1609419600,
         status: [OrderStatus.PENDING, OrderStatus.ACCEPTED],
-        to: 1609506000,
       },
     });
   });

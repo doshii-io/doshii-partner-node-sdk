@@ -441,8 +441,8 @@ describe("Loyalty", () => {
 
   test("Should pass on the options as params for retrieving checkins", async () => {
     const filters: LoyaltyCheckinRetrievalFilters = {
-      from: new Date("01-01-2021"),
-      to: new Date("01-02-2021"),
+      from: new Date(Date.UTC(2021, 0, 1)),
+      to: new Date(Date.UTC(2021, 0, 2)),
       offset: 2,
       limit: 100,
       sort: "asc",
@@ -463,10 +463,10 @@ describe("Loyalty", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/loyalty/checkins`,
       params: {
-        from: 1609419600,
+        from: 1609459200,
+        to: 1609545600,
         limit: 100,
         offset: 2,
-        to: 1609506000,
         sort: "asc",
       },
     });

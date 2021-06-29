@@ -71,10 +71,10 @@ describe("Check in", () => {
       .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
     await expect(
       doshii.checkin.getAll(locationId, {
-        from: new Date("01-01-2021"),
-        to: new Date("01-02-2021"),
-        updatedFrom: new Date("01-01-2021"),
-        updatedTo: new Date("01-02-2021"),
+        from: new Date(Date.UTC(2021, 0, 1)),
+        to: new Date(Date.UTC(2021, 0, 2)),
+        updatedFrom: new Date(Date.UTC(2021, 0, 1)),
+        updatedTo: new Date(Date.UTC(2021, 0, 2)),
         offset: 2,
         limit: 100,
       })
@@ -89,12 +89,12 @@ describe("Check in", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/checkins`,
       params: {
-        from: 1609419600,
+        from: 1609459200,
+        to: 1609545600,
         limit: 100,
         offset: 2,
-        to: 1609506000,
-        updatedFrom: 1609419600,
-        updatedTo: 1609506000,
+        updatedFrom: 1609459200,
+        updatedTo: 1609545600,
       },
     });
   });

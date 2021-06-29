@@ -163,7 +163,7 @@ describe("Location", () => {
     // with filters
     await expect(
       doshii.location.getAllHealths({
-        since: new Date("2021-02-21"),
+        since: new Date(Date.UTC(2021, 0, 1)),
         inverse: false,
         sort: "asc",
       })
@@ -177,7 +177,7 @@ describe("Location", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/health/locations`,
       params: {
-        since: 1613865600,
+        since: 1609459200,
         inverse: false,
         sort: "asc",
       },
