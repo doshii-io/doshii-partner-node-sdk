@@ -130,7 +130,7 @@ try {
 
 #### 2.2.1 Rejection codes
 
-Rejection codes can be retrieved by. The response could be of type `RejectionCodeResponse` or `Array<RejectionCodeResponse>` depeding on if the request was for all the codes or for just one.
+Response to rejection code requests could be of type `RejectionCodeResponse` or `Array<RejectionCodeResponse>` depending on if the request was for all the codes or for just one.
 
 ```node
 import Doshii, { RejectionCodeResponse } from "doshii-sdk";
@@ -146,7 +146,7 @@ const resp = await doshii.getRejectionCode("O1");
 
 #### 2.2.2 Bulk data API
 
-Bulk data API can be accessed directly from the doshii class. This requires App ID to be passed in either during Doshii class instatiation or while calling the bulk data API.
+Bulk data API can be accessed directly from doshii class. This requires App ID to be passed in either during Doshii class instatiation or while calling bulk data API.
 
 ```node
 import Doshii, { LocationClasses, DataAggregationRequest } from "doshii-sdk";
