@@ -33,8 +33,8 @@ describe("Bulk data", () => {
         method: "ASC",
       },
       range: {
-        start: 1466621848,
-        end: 1542628078,
+        start: new Date(Date.UTC(2020, 11, 1)),
+        end: new Date(Date.UTC(2021, 1, 1)),
       },
     };
 
@@ -61,7 +61,25 @@ describe("Bulk data", () => {
       method: "POST",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/data/orders",
-      data,
+      data: {
+        doshiiId: "rj7DnGBL",
+        webhook: {
+          url: "https://my.service.com/webhooks/data",
+          headers: {},
+        },
+        mimeType: "application/json",
+        fileSize: 10000,
+        classifiers: [LocationClasses.BAKERY, LocationClasses.CAFE],
+        locations: ["4gJpXq9B"],
+        sortBy: {
+          property: "created",
+          method: "ASC",
+        },
+        range: {
+          start: 1606780800,
+          end: 1612137600,
+        },
+      },
     });
     expect(authSpy).toBeCalledTimes(1);
   });

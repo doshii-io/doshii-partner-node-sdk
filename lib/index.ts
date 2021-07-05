@@ -93,8 +93,8 @@ export interface DataAggregationRequest {
     method: "ASC" | "DESC";
   };
   range: {
-    start: number;
-    end: number;
+    start: Date;
+    end: Date;
   };
 }
 
@@ -475,13 +475,19 @@ export default class Doshii {
       this.generateApiKey(appId);
     }
 
+    const _data: any = data;
+
+    // convert date to unix epoch time
+    _data.range.start = Math.floor(data.range.start.getTime() / 1000);
+    _data.range.end = Math.floor(data.range.end.getTime() / 1000);
+
     return this.submitRequest({
       url: `/data/${dataset}`,
       method: "POST",
       headers: {
         "X-API-KEY": this.apiKey,
       },
-      data,
+      data: _data,
     });
   }
 

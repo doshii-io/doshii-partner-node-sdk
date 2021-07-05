@@ -43,7 +43,7 @@ const doshii = new Doshii('myClientId', 'myClientSecret', options);
 
 ### 2.1 Websocket
 
-Websocket starts up when one subscribes to an event and remains active as long as there is atleast one subscriber. When all the subscribers have unsubscribed, websocket disconnects and waits for the next subscriber to start over again. Once started heartbeat (ping/pong) messages are exchanged at set time intervals (defaults to 30 seconds and can be set during Doshii class instantiation)
+Websocket starts up when one subscribes to an event and remains active as long as there is atleast one subscriber. When all the subscribers have unsubscribed, websocket disconnects and waits for the next subscriber to start over again. Once started, heartbeat (ping/pong) messages are exchanged at set time intervals (defaults to 30 seconds and can be set during Doshii class instantiation)
 
 One can subscribe to multiple websocket events with a callback function.
 
@@ -152,32 +152,36 @@ Bulk data API can be accessed directly from the doshii class. This requires App 
 import Doshii, { LocationClasses, DataAggregationRequest } from "doshii-sdk";
 
 const doshii = new Doshii("myClientId", "myClientSecret");
-    const data: DataAggregationRequest = {
-      doshiiId: "rj7DnGBL",
-      webhook: {
-        url: "https://my.service.com/webhooks/data",
-        headers: {},
-      },
-      mimeType: "application/json",
-      fileSize: 10000,
-      classifiers: [LocationClasses.BAKERY, LocationClasses.CAFE],
-      locations: ["4gJpXq9B"],
-      sortBy: {
-        property: "created",
-        method: "ASC",
-      },
-      range: {
-        start: 1466621848,
-        end: 1542628078,
-      },
-    };
+
+const data: DataAggregationRequest = {
+  doshiiId: "rj7DnGBL",
+  webhook: {
+    url: "https://my.service.com/webhooks/data",
+    headers: {},
+  },
+  mimeType: "application/json",
+  fileSize: 10000,
+  classifiers: [LocationClasses.BAKERY, LocationClasses.CAFE],
+  locations: ["4gJpXq9B"],
+  sortBy: {
+    property: "created",
+    method: "ASC",
+  },
+  range: {
+    start: new Date(Date.UTC(2020, 11, 1)),
+    end: new Date(Date.UTC(2021, 1, 1)),
+  },
 };
 
 // since App ID was not passed in earlier
 // it has to be passes during fucntion call
-const reqDetails = await doshii.requestBulkDataAggregation("orders", data, 'myAppID');
+const reqDetails = await doshii.requestBulkDataAggregation(
+  "orders",
+  data,
+  "myAppID"
+);
 
 // Else we could pass in during class instantiation
-const doshii = new Doshii("myClientId", "myClientSecret", {appId:'myAppID'});
+const doshii = new Doshii("myClientId", "myClientSecret", { appId: "myAppID" });
 const reqDetails = await doshii.requestBulkDataAggregation("orders", data);
 ```
