@@ -1,4 +1,4 @@
-import Doshii, { WebSocketEvents } from "../lib";
+import Doshii, { WebsocketEvents } from "../lib";
 import WebSocket from "ws";
 
 jest.mock("ws");
@@ -29,7 +29,7 @@ describe("Websocket", () => {
         eventHandlers[event] = handler;
       });
     const subscriber = doshii.subscribeToWebsockeEvents(
-      [WebSocketEvents.PONG],
+      [WebsocketEvents.PONG],
       jest.fn()
     );
     expect(wsSpy).toBeCalledWith("open", eventHandlers["open"]);
@@ -37,7 +37,7 @@ describe("Websocket", () => {
     expect(wsSendSpy).toHaveBeenCalledWith(
       JSON.stringify({ doshii: { ping: 111222333, version: "1.2.3" } })
     );
-    doshii.unsubscribeFromWebsocketEvents(subscriber, [WebSocketEvents.PONG]);
+    doshii.unsubscribeFromWebsocketEvents(subscriber, [WebsocketEvents.PONG]);
     jest.useFakeTimers();
     jest.runAllTimers();
     expect(wsSpy).toBeCalledWith("close", eventHandlers["close"]);

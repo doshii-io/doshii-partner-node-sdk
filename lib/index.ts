@@ -49,7 +49,7 @@ import Checkin, {
 import { LogLevel, Logger } from "./utils";
 import { LocationClasses, Product, LogsResponse } from "./sharedSchema";
 
-export enum WebSocketEvents {
+export enum WebsocketEvents {
   ORDER_UPDATED = "order_updated",
   ORDER_CREATED = "order_created",
   TRANSACTION_UPDATED = "transaction_updated",
@@ -136,9 +136,12 @@ export default class Doshii {
   private websocket!: WebSocket;
   private subscribers: Map<
     string,
-    { callback: (data: any) => void; events: Array<WebSocketEvents> }
+    {
+      callback: (event: WebsocketEvents, data: any) => void;
+      events: Array<WebsocketEvents>;
+    }
   > = new Map();
-  private eventSubscribers: Map<WebSocketEvents, Array<string>> = new Map();
+  private eventSubscribers: Map<WebsocketEvents, Array<string>> = new Map();
 
   readonly location: Location;
   readonly order: Order;
@@ -273,7 +276,7 @@ export default class Doshii {
     const eventData = JSON.parse(event);
     if (eventData?.doshii?.pong) {
       this.logger.debug("Doshii: Got pong");
-      this.notifySubscribers(WebSocketEvents.PONG, eventData);
+      this.notifySubscribers(WebsocketEvents.PONG, eventData);
       return;
     }
     const eventType = eventData.emit[0];
@@ -281,7 +284,7 @@ export default class Doshii {
     this.notifySubscribers(eventType, eventPayload);
   }
 
-  private notifySubscribers(event: WebSocketEvents, data: any) {
+  private notifySubscribers(event: WebsocketEvents, data: any) {
     // get subscribers for the event
     if (!this.eventSubscribers.has(event)) return;
     const subscribers = this.eventSubscribers.get(event);
@@ -299,7 +302,7 @@ export default class Doshii {
         this.subscribers.delete(subscriber);
       }
       try {
-        callback(data);
+        callback(event, data);
       } catch (error) {
         this.logger.error(
           `Doshii: Error while executing callback for subscriber ${subscriber}`
@@ -326,8 +329,8 @@ export default class Doshii {
    * @returns subscriber ID
    */
   subscribeToWebsockeEvents(
-    events: Array<WebSocketEvents>,
-    callback: (data: any) => void
+    events: Array<WebsocketEvents>,
+    callback: (event: WebsocketEvents, data: any) => void
   ) {
     // If first subscriber start websocket
     if (this.subscribers.size < 1) {
@@ -363,7 +366,7 @@ export default class Doshii {
    */
   unsubscribeFromWebsocketEvents(
     subscriberId: string,
-    events?: Array<WebSocketEvents>
+    events?: Array<WebsocketEvents>
   ) {
     if (!this.subscribers.has(subscriberId)) {
       throw new Error("Doshii: Invalid subscriber ID");
@@ -430,9 +433,12 @@ export default class Doshii {
     this.subscribers.clear();
   }
 
+  unsubscribeFromAllWebsocketEvents = this.clearAllWebsocketSubscriptions;
+
   /**
    * Retrieve all rejection codes
-   * @returns List of all rejection codes
+   * @param code optional rejection code to retrieve
+   * @returns List of all rejection codes if code is ommitted or a specific rejection code details
    */
   async getRejectionCodes(
     code?: string
