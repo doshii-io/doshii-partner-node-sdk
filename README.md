@@ -7,7 +7,8 @@ TypeScript wrapper for the Doshii Partner API.
 To build do,
 
 ```bash
-npm run build
+npm install
+npm run build (run as part of prepublish script)
 npm pack
 ```
 
@@ -27,16 +28,16 @@ All the API s are properties of the main `Doshii` class, which can be invoked as
 import Doshii, {LogLevel} from 'doshii-sdk'
 
 const options = {
-	// required when using the bulk data API
-	appId: 'myAppID';
-	// Are you using the sandbox environment, defaults to false
-	sandbox: true;
-	// Defaults to 3
-	apiVersion: 3;
-	// Defaults to WARN
-	logLevel: LogLevel.INFO;
-	// Heartbeat interval for websocket, defaults to 30 seconds
-	pingInterval: 30;
+  // required when using the bulk data API
+  appId: 'myAppID';
+  // Are you using the sandbox environment, defaults to false
+  sandbox: true;
+  // Defaults to 3
+  apiVersion: 3;
+  // Defaults to WARN
+  logLevel: LogLevel.INFO;
+  // Heartbeat interval for websocket, defaults to 30 seconds
+  pingInterval: 30;
 }
 const doshii = new Doshii('myClientId', 'myClientSecret', options);
 ```
