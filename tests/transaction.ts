@@ -96,7 +96,7 @@ describe("Transaction", () => {
           description: "Item description",
           amount: 1000,
           type: "absolute",
-          value: "1000",
+          value: 1000,
         },
       ],
     };
@@ -144,7 +144,7 @@ describe("Transaction", () => {
           description: "Item description",
           amount: 1000,
           type: "absolute",
-          value: "1000",
+          value: 1000,
         },
       ],
       verifyData: {

@@ -34,8 +34,8 @@ export enum DoshiiEvents {
 export interface WebhookRegister {
   event: DoshiiEvents;
   webhookUrl: string;
-  authenticationKey: string;
-  authenticationToken: string;
+  authenticationKey?: string;
+  authenticationToken?: string;
 }
 
 export interface WebhookResponse {
@@ -46,6 +46,7 @@ export interface WebhookResponse {
   updatedAt: string;
   createdAt: string;
   uri: string;
+  locationId?: string;
 }
 /**
  * Webhooks API
@@ -55,6 +56,23 @@ export default class Webhook {
 
   constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
+  }
+
+  /**
+   * Retrieve webhooks registered for your application from specific location
+   * @param locationId hashed location ID of the location
+   */
+
+  async getFromLocation(
+    locationId: string
+  ): Promise<Array<WebhookResponse> | WebhookResponse> {
+    return await this.requestMaker({
+      headers: {
+        "doshii-location-id": locationId,
+      },
+      url: "/webhooks",
+      method: "GET",
+    });
   }
 
   /**
@@ -96,8 +114,11 @@ export default class Webhook {
    * @returns the registered webhook
    *
    */
-  async registerWebhook(data: WebhookRegister): Promise<WebhookResponse> {
+  async registerWebhook(data: WebhookRegister, locationId: string): Promise<WebhookResponse> {
     return await this.requestMaker({
+      headers: {
+        "doshii-location-id": locationId,
+      },
       url: "/webhooks",
       method: "POST",
       data,
@@ -126,8 +147,11 @@ export default class Webhook {
    * @param event The name of the Doshii event that the webhook subscription is being removed from.
    * @returns status of the operation
    */
-  async unregisterWebhook(event: DoshiiEvents): Promise<{ message: string }> {
+  async unregisterWebhook(event: DoshiiEvents, locationId: string): Promise<{ message: string }> {
     return await this.requestMaker({
+      headers: {
+        "doshii-location-id": locationId,
+      },
       url: `/webhooks/${event}`,
       method: "DELETE",
     });

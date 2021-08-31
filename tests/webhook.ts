@@ -19,6 +19,7 @@ describe("Webhook", () => {
   let doshii: Doshii;
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
+  const locationId = 'someid'
   let authSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -42,6 +43,26 @@ describe("Webhook", () => {
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/webhooks",
+    });
+    expect(authSpy).toBeCalledTimes(1);
+  });
+
+  test("Should request for a specific webhook location", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleResponse });
+    await expect(
+      doshii.webhook.getFromLocation(locationId)
+    ).resolves.toMatchObject(sampleResponse);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+        "doshii-location-id": locationId
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: `/webhooks`,
     });
     expect(authSpy).toBeCalledTimes(1);
   });
@@ -75,13 +96,14 @@ describe("Webhook", () => {
       authenticationKey: "secure_key",
       authenticationToken: "secure_token",
     };
-    await expect(doshii.webhook.registerWebhook(data)).resolves.toMatchObject(
+    await expect(doshii.webhook.registerWebhook(data, locationId)).resolves.toMatchObject(
       sampleResponse
     );
     expect(requestSpy).toBeCalledWith({
       headers: {
         authorization: "Bearer signedJwt",
         "content-type": "application/json",
+        "doshii-location-id": locationId
       },
       method: "POST",
       baseURL: "https://sandbox.doshii.co/partner/v3",
@@ -125,7 +147,7 @@ describe("Webhook", () => {
       data: { message: "The webhook subscription that was deleted" },
     });
     await expect(
-      doshii.webhook.removeWebhook(DoshiiEvents.CHECKIN_CREATED)
+      doshii.webhook.removeWebhook(DoshiiEvents.CHECKIN_CREATED, locationId)
     ).resolves.toMatchObject({
       message: "The webhook subscription that was deleted",
     });
@@ -133,6 +155,7 @@ describe("Webhook", () => {
       headers: {
         authorization: "Bearer signedJwt",
         "content-type": "application/json",
+        "doshii-location-id": locationId
       },
       method: "DELETE",
       baseURL: "https://sandbox.doshii.co/partner/v3",

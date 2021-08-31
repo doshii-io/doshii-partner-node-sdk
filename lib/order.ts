@@ -18,15 +18,15 @@ export enum OrderStatus {
   VENUE_CANCELLED = "venue_cancelled",
 }
 
-type Tax = {
-  posId: string;
+export type Tax = {
+  posId?: string;
   name: string;
   amount: string;
   type: "absolute" | "percentage";
   taxType: "exclusive" | "inclusive";
   value: string;
 };
-interface ProductWithTaxes extends Product {
+export interface ProductWithTaxes extends Product {
   taxes: Array<Tax>;
 }
 export interface AddItemToOrderRequest
@@ -292,9 +292,9 @@ export default class Order {
     orderId: string,
     data: {
       status: OrderStatus;
-      mealPhase: MealPhase;
+      mealPhase?: MealPhase;
       version: string;
-      log: LogsRequest;
+      log?: LogsRequest;
     }
   ): Promise<OrderResponse> {
     return await this.requestMaker({

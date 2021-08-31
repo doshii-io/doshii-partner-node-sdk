@@ -14,7 +14,7 @@ npm pack
 Installation can be done from the tar ball created by `npm pack`
 
 ```
-npm i doshii-sdk-2.0.0.tgz
+npm i doshii-sdk-2.0.3.tgz
 ```
 
 ## 2.0 Usage
@@ -27,16 +27,16 @@ All the API s are properties of the main `Doshii` class, which can be invoked as
 import Doshii, {LogLevel} from 'doshii-sdk'
 
 const options = {
-	// required when using the bulk data API
-	appId: 'myAppID';
-	// Are you using the sandbox environment, defaults to false
-	sandbox: true;
-	// Defaults to 3
-	apiVersion: 3;
-	// Defaults to WARN
-	logLevel: LogLevel.INFO;
-	// Heartbeat interval for websocket, defaults to 30 seconds
-	pingInterval: 30;
+ // required when using the bulk data API
+ appId: 'myAppID';
+ // Are you using the sandbox environment, defaults to false
+ sandbox: true;
+ // Defaults to 3
+ apiVersion: 3;
+ // Defaults to WARN
+ logLevel: LogLevel.INFO;
+ // Heartbeat interval for websocket, defaults to 30 seconds
+ pingInterval: 30;
 }
 const doshii = new Doshii('myClientId', 'myClientSecret', options);
 ```

@@ -43,7 +43,7 @@ const sampleItemToAddToOrder: AddItemToOrderRequest = {
             {
               posId: "123",
               name: "Variant name",
-              price: "1000",
+              price: 1000,
             },
           ],
         },
@@ -78,7 +78,7 @@ const sampleItemToAddToOrder: AddItemToOrderRequest = {
         {
           posId: "123",
           name: "Variant name",
-          price: "1000",
+          price: 1000,
         },
       ],
     },
@@ -120,7 +120,7 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
                 {
                   posId: "123",
                   name: "Variant name",
-                  price: "1000",
+                  price: 1000,
                 },
               ],
             },
@@ -155,7 +155,7 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
             {
               posId: "123",
               name: "Variant name",
-              price: "1000",
+              price: 1000,
             },
           ],
         },
@@ -169,7 +169,7 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
       description: "Item description",
       amount: 1000,
       type: "absolute",
-      value: "1000",
+      value: 1000,
     },
   ],
   taxes: [

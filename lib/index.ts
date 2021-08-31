@@ -5,6 +5,7 @@ import WebSocket from "ws";
 
 import Location, { LocationResponse } from "./location";
 import Order, {
+  Tax,
   OrderRetrievalFilters,
   OrderStatus,
   OrderResponse,
@@ -47,7 +48,7 @@ import Checkin, {
 } from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
-import { LocationClasses, Product, LogsResponse } from "./sharedSchema";
+import { LocationClasses, Product, LogsResponse, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
 
 export enum WebsocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -523,6 +524,7 @@ export default class Doshii {
 }
 
 export {
+  Tax,
   OrderStatus,
   OrderRetrievalFilters,
   LogLevel,
@@ -538,6 +540,9 @@ export {
   TransactionUpdate,
   TransactionRequest,
   LogsResponse,
+  Surcount,
+  ProductOptions,
+  ProductOptionsVariant,
   BookingStatus,
   LoyaltyCardRequest,
   LoyaltyCardResponse,
