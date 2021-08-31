@@ -39,6 +39,8 @@ export const sampleOrderRequest: OrderRequest = {
                     price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -74,6 +76,8 @@ export const sampleOrderRequest: OrderRequest = {
                 price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },

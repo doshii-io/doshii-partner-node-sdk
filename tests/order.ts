@@ -46,6 +46,8 @@ const sampleItemToAddToOrder: AddItemToOrderRequest = {
               price: 1000,
             },
           ],
+          min: '0',
+          max: '0'
         },
       ],
     },
@@ -81,6 +83,8 @@ const sampleItemToAddToOrder: AddItemToOrderRequest = {
           price: 1000,
         },
       ],
+      min: '0',
+      max: '0'
     },
   ],
 };
@@ -123,6 +127,8 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
                   price: 1000,
                 },
               ],
+              min: '0',
+              max: '0'
             },
           ],
         },
@@ -158,6 +164,8 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
               price: 1000,
             },
           ],
+          min: '0',
+          max: '0'
         },
       ],
     },

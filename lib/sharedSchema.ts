@@ -3,8 +3,8 @@ export interface Surcount {
   name: string;
   description?: string;
   amount: number;
-  type: "absolute" | "percentage" | "unit";
-  value?: number;
+  type: "absolute" | "percentage";
+  value: number;
   rewardRef?: string;
 }
 
@@ -69,8 +69,8 @@ export interface ProductOptions {
   posId?: string;
   name: string;
   variants: ProductOptionsVariant[]
-  min?: string
-  max?: string
+  min: string
+  max: string
 }
 
 export interface ProductOptionsVariant {

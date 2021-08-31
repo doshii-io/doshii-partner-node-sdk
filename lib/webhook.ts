@@ -114,11 +114,13 @@ export default class Webhook {
    * @returns the registered webhook
    *
    */
-  async registerWebhook(data: WebhookRegister, locationId: string): Promise<WebhookResponse> {
+  async registerWebhook(data: WebhookRegister, locationId?: string): Promise<WebhookResponse> {
     return await this.requestMaker({
-      headers: {
-        "doshii-location-id": locationId,
-      },
+      ...(locationId && {
+        headers: {
+           "doshii-location-id": locationId,
+        },
+     }),
       url: "/webhooks",
       method: "POST",
       data,
@@ -147,11 +149,13 @@ export default class Webhook {
    * @param event The name of the Doshii event that the webhook subscription is being removed from.
    * @returns status of the operation
    */
-  async unregisterWebhook(event: DoshiiEvents, locationId: string): Promise<{ message: string }> {
+  async unregisterWebhook(event: DoshiiEvents, locationId?: string): Promise<{ message: string }> {
     return await this.requestMaker({
-      headers: {
-        "doshii-location-id": locationId,
-      },
+      ...(locationId && {
+        headers: {
+           "doshii-location-id": locationId,
+        },
+     }),
       url: `/webhooks/${event}`,
       method: "DELETE",
     });

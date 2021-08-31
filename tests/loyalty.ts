@@ -49,6 +49,8 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
                     price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -74,6 +76,8 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
                 price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },
@@ -216,6 +220,8 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
                     price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -241,6 +247,8 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
                 price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },
