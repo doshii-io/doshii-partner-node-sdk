@@ -36,9 +36,11 @@ export const sampleOrderRequest: OrderRequest = {
                   {
                     posId: "123",
                     name: "Variant name",
-                    price: "1000",
+                    price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -71,9 +73,11 @@ export const sampleOrderRequest: OrderRequest = {
               {
                 posId: "123",
                 name: "Variant name",
-                price: "1000",
+                price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },
@@ -85,7 +89,7 @@ export const sampleOrderRequest: OrderRequest = {
         description: "Item description",
         amount: 1000,
         type: "absolute",
-        value: "1000",
+        value: 1000,
       },
     ],
     taxes: [
@@ -139,7 +143,7 @@ export const sampleOrderRequest: OrderRequest = {
           description: "Item description",
           amount: 1000,
           type: "absolute",
-          value: "1000",
+          value: 1000,
         },
       ],
     },

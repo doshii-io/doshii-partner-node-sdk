@@ -46,9 +46,11 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
                   {
                     posId: "123",
                     name: "Variant name",
-                    price: "1000",
+                    price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -71,9 +73,11 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
               {
                 posId: "123",
                 name: "Variant name",
-                price: "1000",
+                price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },
@@ -86,7 +90,7 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
         description: "Reward discount description",
         amount: 1000,
         type: "absolute",
-        value: "1000",
+        value: 1000,
       },
     ],
   },
@@ -213,9 +217,11 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
                   {
                     posId: "123",
                     name: "Variant name",
-                    price: "1000",
+                    price: 1000,
                   },
                 ],
+                min: '0',
+                max: '0'
               },
             ],
           },
@@ -238,9 +244,11 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
               {
                 posId: "123",
                 name: "Variant name",
-                price: "1000",
+                price: 1000,
               },
             ],
+            min: '0',
+            max: '0'
           },
         ],
       },
@@ -253,7 +261,7 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
         description: "Reward discount description",
         amount: 1000,
         type: "absolute",
-        value: "1000",
+        value: 1000,
       },
     ],
   },

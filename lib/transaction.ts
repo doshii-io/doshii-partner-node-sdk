@@ -23,24 +23,24 @@ type PaymentMethod =
 export interface TransactionRequest {
   amount: number;
   reference: string;
-  invoice: string;
-  linkedTrxId: string;
+  invoice?: string;
+  linkedTrxId?: string;
   method: PaymentMethod;
-  tip: number;
-  trn: string;
+  tip?: number;
+  trn?: string;
   prepaid: boolean;
-  surcounts: Array<Surcount>;
+  surcounts?: Array<Surcount>;
 }
 
 export interface TransactionUpdate {
-  amount: number;
-  reference: string;
-  invoice: string;
-  method: PaymentMethod;
-  tip: number;
-  trn: string;
-  prepaid: boolean;
-  surcounts: Array<Surcount>;
+  amount?: number;
+  reference?: string;
+  invoice?: string;
+  method?: PaymentMethod;
+  tip?: number;
+  trn?: string;
+  prepaid?: boolean;
+  surcounts?: Array<Surcount>;
   version: string;
   status:
     | "requested"
@@ -49,8 +49,8 @@ export interface TransactionUpdate {
     | "cancelled"
     | "rejected"
     | "complete";
-  rejectionCode: "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "POSISE";
-  rejectionReason: string;
+  rejectionCode?: "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7" | "POSISE";
+  rejectionReason?: string;
   verifyData?: {
     requires: Array<
       | "accountId"
@@ -59,11 +59,11 @@ export interface TransactionUpdate {
       | "authorisationCode"
       | "imageUri"
     >;
-    accountId: string;
-    issueDate: string;
-    expiryDate: string;
-    authorisationCode: string;
-    imageUri: string;
+    accountId?: string;
+    issueDate?: string;
+    expiryDate?: string;
+    authorisationCode?: string;
+    imageUri?: string;
   };
 }
 

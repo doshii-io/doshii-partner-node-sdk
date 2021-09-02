@@ -20,12 +20,12 @@ export interface CheckinResponse {
 }
 
 export interface CheckinRequest {
-  ref: string;
+  ref?: string;
   status?: "pending" | "cancelled" | "accepted" | "rejected" | "complete";
   tableNames: Array<string>;
-  covers: number;
-  completedAt: string | null;
-  log: {
+  covers?: number;
+  completedAt?: string | null;
+  log?: {
     employeeId: number;
     employeePosRef: string;
     employeeName: string;
@@ -33,7 +33,7 @@ export interface CheckinRequest {
     deviceName: string;
     area: string;
   };
-  consumer: Consumer;
+  consumer?: Consumer;
 }
 
 export interface CheckinRetrievalFilters {

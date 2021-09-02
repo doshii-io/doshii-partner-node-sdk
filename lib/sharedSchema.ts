@@ -1,10 +1,10 @@
 export interface Surcount {
-  posId: string;
+  posId?: string;
   name: string;
-  description: string;
+  description?: string;
   amount: number;
   type: "absolute" | "percentage";
-  value: string;
+  value: number;
   rewardRef?: string;
 }
 
@@ -66,15 +66,17 @@ export enum LocationClasses {
   TEST = "Test",
 }
 export interface ProductOptions {
-  posId: string;
+  posId?: string;
   name: string;
-  variants: [
-    {
-      posId: string;
-      name: string;
-      price: string;
-    }
-  ];
+  variants: ProductOptionsVariant[]
+  min: string
+  max: string
+}
+
+export interface ProductOptionsVariant {
+  posId?: string;
+  name: string;
+  price: number;
 }
 
 export interface Product {
