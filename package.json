@@ -1,6 +1,7 @@
 {
   "name": "doshii-sdk",
-  "version": "2.0.0",
+  "version": "3.0.0",
+  "author": "Doshii",
   "description": "Module for Doshii partner APIs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +19,6 @@
     "Doshii SDK",
     "Doshi partner API"
   ],
-  "author": "Jobin Thayyil",
   "license": "MIT",
   "devDependencies": {
     "@types/axios": "^0.14.0",

@@ -1,6 +1,6 @@
 # Doshii partner node SDK
 
-TypeScript wrapper for the Doshii Partner API.
+This is a Node SDK that can be used by app partners building an integration into the Doshii ecosystem. It is a TypeScript wrapper for the Doshii Partner API.
 
 ## 1.0 Build and install
 
@@ -186,3 +186,6 @@ const reqDetails = await doshii.requestBulkDataAggregation(
 const doshii = new Doshii("myClientId", "myClientSecret", { appId: "myAppID" });
 const reqDetails = await doshii.requestBulkDataAggregation("orders", data);
 ```
+
+## 3.0 Want to contribute? 
+We welcome our app partners to contribute to this SDK. At Doshii we follow normal gitflow processes so please feel free to create a branch with your changes and raise a pull request to `main` when you are ready for review. Thank you.
