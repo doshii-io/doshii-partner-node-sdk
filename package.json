@@ -1,5 +1,5 @@
 {
-  "name": "doshii-sdk",
+  "name": "doshii-partner-node-sdk",
   "version": "3.0.0",
   "author": "Doshii",
   "description": "Module for Doshii partner APIs",
