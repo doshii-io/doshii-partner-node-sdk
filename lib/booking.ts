@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Consumer, LogsResponse } from "./sharedSchema";
+import { Consumer } from "./sharedSchema";
 import { CheckinRequest, CheckinResponse } from "./checkin";
 import { OrderRequest, OrderResponse, OrderResponses } from "./order";
 
@@ -133,22 +133,6 @@ export default class Booking {
     bookingId: string
   ): Promise<BookingResponse> {
     return this.get(locationId, bookingId) as Promise<BookingResponse>;
-  }
-
-  /**
-   * Retrieve a list of all logs for a Booking
-   * @param locationId The hashed Location ID of the location you are interacting with
-   * @param bookingId ID of the booking to retrieve
-   * @returns The audit logs for the reservation
-   */
-  async getLogs(locationId: string, bookingId: string): Promise<LogsResponse> {
-    return await this.requestMaker({
-      url: `/bookings/${bookingId}/logs`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-    });
   }
 
   /**

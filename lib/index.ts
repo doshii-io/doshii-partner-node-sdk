@@ -48,7 +48,7 @@ import Checkin, {
 } from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
-import { LocationClasses, Product, LogsResponse, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
+import { LocationClasses, Product, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
 
 export enum WebsocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -539,7 +539,6 @@ export {
   TransactionResponse,
   TransactionUpdate,
   TransactionRequest,
-  LogsResponse,
   Surcount,
   ProductOptions,
   ProductOptionsVariant,

@@ -22,22 +22,22 @@ npm i doshii-sdk-2.0.0.tgz
 
 The `Doshii` constructor accepts credentials and is thereafter used for all the API calls.
 
-All the API s are properties of the main `Doshii` class, which can be invoked as required. The API s include `location`, `checkin`, `device`, `loyalty`, `menu`, `order`, `table`, `transaction`, `webhook` and `booking`.
+All the API's are properties of the main `Doshii` class, which can be invoked as required. The API s include `location`, `checkin`, `device`, `loyalty`, `menu`, `order`, `table`, `transaction`, `webhook` and `booking`.
 
 ```node
 import Doshii, {LogLevel} from 'doshii-sdk'
 
 const options = {
   // required when using the bulk data API
-  appId: 'myAppID';
+  appId: 'myAppID',
   // Are you using the sandbox environment, defaults to false
-  sandbox: true;
+  sandbox: true,
   // Defaults to 3
-  apiVersion: 3;
+  apiVersion: 3,
   // Defaults to WARN
-  logLevel: LogLevel.INFO;
+  logLevel: LogLevel.INFO,
   // Heartbeat interval for websocket, defaults to 30 seconds
-  pingInterval: 30;
+  pingInterval: 30
 }
 const doshii = new Doshii('myClientId', 'myClientSecret', options);
 ```
@@ -79,7 +79,7 @@ doshii.unsubscribeFromAllWebsocketEvents();
 
 ### 2.2 Calling API s
 
-All API s confirm to the [OPEN API specs](https://sandbox-dashboard.doshii.io/docs/api/app)
+All API's conform to the [OPEN API specs](https://sandbox-dashboard.doshii.io/docs/api/app)
 
 ```node
 doshii.location

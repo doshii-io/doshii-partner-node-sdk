@@ -10,37 +10,21 @@ export interface Surcount {
 
 export interface Consumer {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
-  marketingOptIn: boolean;
-  address: {
+  marketingOptIn?: boolean;
+  address?: {
     line1: string;
-    line2: string;
+    line2?: string;
     city: string;
     state: string;
     postalCode: string;
     country: string;
-    notes: string;
+    notes?: string;
   };
 }
 
-export interface LogsResponse {
-  logId: string;
-  employeeId: string;
-  employeeName: string;
-  employeePosRef: string;
-  deviceRef: string;
-  deviceName: string;
-  area: string;
-  appId: string;
-  appName: string;
-  audit: string;
-  action: Array<string>;
-  performedAt: string;
-}
-
 export interface LogsRequest {
-  employeeId: number;
   employeeName: string;
   employeePosRef: string;
   deviceRef: string;
@@ -68,7 +52,7 @@ export enum LocationClasses {
 export interface ProductOptions {
   posId?: string;
   name: string;
-  variants: ProductOptionsVariant[]
+  variants: Array<ProductOptionsVariant>
   min: string
   max: string
 }
@@ -78,37 +62,26 @@ export interface ProductOptionsVariant {
   name: string;
   price: number;
 }
-
+export interface ProductIncludedItem {
+  name: string;
+  posId?: string;
+  quantity: number;
+  unitPrice: string;
+  options: Array<ProductOptions>;
+}
 export interface Product {
   rewardRef?: string;
   uuid?: string;
-  posId: string;
+  posId?: string;
   name: string;
   quantity: number;
-  description: string;
+  description?: string;
   unitPrice: string;
   totalBeforeSurcounts: string;
   totalAfterSurcounts: string;
-  tags: Array<string>;
+  tags?: Array<string>;
   type: "bundle" | "single";
-  includedItems: [
-    {
-      name: string;
-      posId: string;
-      quantity: number;
-      unitPrice: string;
-      options: Array<ProductOptions>;
-    }
-  ];
-  surcounts: [
-    {
-      posId: "123";
-      name: "Item name";
-      description: "Item description";
-      amount: 1000;
-      type: "absolute";
-      value: "1000";
-    }
-  ];
+  includedItems?: Array<ProductIncludedItem>;
+  surcounts: Array<Surcount>;
   options: Array<ProductOptions>;
 }

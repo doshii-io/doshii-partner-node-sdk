@@ -13,17 +13,18 @@ interface MenuAltNames {
     default: string;
   };
 }
+interface MenuVariant {
+  posId: string;
+  name: string;
+  price: string;
+  alternateNames?: MenuAltNames;
+}
 interface MenuOptions {
   posId: string;
   name: string;
   min: string;
   max: string;
-  variants: Array<{
-    posId: string;
-    name: string;
-    price: string;
-    alternateNames: MenuAltNames;
-  }>;
+  variants: Array<MenuVariant>;
   alternateNames: MenuAltNames;
 }
 interface MenuProductIds {
@@ -35,7 +36,22 @@ interface MenuProductIds {
   plu: string;
   barcodes: Array<string>;
 }
-
+interface MenuIncludedItem {
+  posId: string;
+  productIds?: MenuProductIds;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  options: Array<MenuOptions>;
+  alternateNames?: MenuAltNames;
+}
+interface MenuBundledItem {
+  posId?: string;
+  name: string;
+  min: number;
+  max: number;
+  includedItems: Array<MenuIncludedItem>;
+}
 export interface MenuProduct {
   posId: string;
   name: string;
@@ -55,33 +71,11 @@ export interface MenuProduct {
     | "vegetarian"
   >;
   menuDir: Array<string>;
-  includedItems: Array<{
-    posId: string;
-    productIds: MenuProductIds;
-    name: string;
-    quantity: number;
-    unitPrice: number;
-    options: MenuOptions;
-    alternateNames: MenuAltNames;
-  }>;
-  bundledItems: Array<{
-    posId: string;
-    name: string;
-    min: number;
-    max: number;
-    includedItems: Array<{
-      posId: string;
-      productIds: MenuProductIds;
-      name: string;
-      quantity: number;
-      unitPrice: number;
-      options: MenuOptions;
-      alternateNames: MenuAltNames;
-    }>;
-  }>;
+  includedItems: Array<MenuIncludedItem>;
+  bundledItems?: Array<MenuBundledItem>;
   options: Array<MenuOptions>;
   surcounts: Array<Surcount>;
-  alternateNames: MenuAltNames;
+  alternateNames?: MenuAltNames;
   imageUri: string;
 }
 export interface MenuResponse {

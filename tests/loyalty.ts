@@ -6,7 +6,6 @@ import Doshii, {
 } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { sampleLogsResponse } from "./sharedSamples";
 
 jest.mock("axios");
 jest.mock("jsonwebtoken");
@@ -62,7 +61,7 @@ const sampleLoyaltyCheckinRequest: LoyaltyCheckinRequest = {
             description: "Item description",
             amount: 1000,
             type: "absolute",
-            value: "1000",
+            value: 1000,
           },
         ],
         options: [
@@ -233,7 +232,7 @@ const sampleLoyaltyMemberActivityRequest: LoyaltyMemberActivityRequest = {
             description: "Item description",
             amount: 1000,
             type: "absolute",
-            value: "1000",
+            value: 1000,
           },
         ],
         options: [
@@ -368,7 +367,6 @@ const sampleLoyaltyCardResponse = {
   posTerminalId: "123",
   processedByApp: 1,
   uri: "https://sandbox.doshii.co/partner/v3/loyalty/cards/enquiry/124",
-  log: "https://sandbox.doshii.co/partner/v3/loyalty/cards/enquiry/124/logs",
   createdAt: "2019-01-01T12:00:00.000Z",
   updatedAt: "2019-01-01T12:00:00.000Z",
 };
@@ -381,7 +379,6 @@ const sampleLoyaltyCardRequest: LoyaltyCardRequest = {
   reference: "1af533-23f342d-2342",
   cancelledReason: "Technical issue",
   log: {
-    employeeId: 123,
     employeePosRef: "123",
     employeeName: "John Doe",
     deviceRef: "123",
@@ -665,27 +662,6 @@ describe("Loyalty", () => {
     });
   });
 
-  test("Should request for card enquiry logs", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: sampleLogsResponse,
-    });
-    const requestId = "aklsdhfj90834";
-    await expect(
-      doshii.loyalty.getCardEnquiryLogs(locationId, requestId)
-    ).resolves.toMatchObject(sampleLogsResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/loyalty/cards/enquiry/${requestId}/logs`,
-    });
-  });
-
   test("Should request for card activation requests", async () => {
     const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
       status: 200,
@@ -730,27 +706,6 @@ describe("Loyalty", () => {
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/loyalty/cards/activation/${requestId}`,
       data: sampleLoyaltyCardRequest,
-    });
-  });
-
-  test("Should request for card activation logs", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: sampleLogsResponse,
-    });
-    const requestId = "aklsdhfj90834";
-    await expect(
-      doshii.loyalty.getCardActivationLogs(locationId, requestId)
-    ).resolves.toMatchObject(sampleLogsResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/loyalty/cards/activation/${requestId}/logs`,
     });
   });
 });

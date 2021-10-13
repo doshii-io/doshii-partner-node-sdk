@@ -3,7 +3,6 @@ import { CheckinResponse } from "./checkin";
 import {
   Consumer,
   LogsRequest,
-  LogsResponse,
   Product,
   Surcount,
 } from "./sharedSchema";
@@ -68,7 +67,7 @@ export interface OrderResponse {
   manuallyProcessed: boolean;
   mealPhase: MealPhase;
   status: OrderStatus;
-  type: "delivery" | " pickup" | " dinein";
+  type: "delivery" | "pickup" | "dinein";
   notes: string;
   revenueCentre: string;
   requiredAt: string;
@@ -117,7 +116,6 @@ export interface OrderResponse {
   version: string;
   uri: string;
   transactionUri: string;
-  log: string;
 }
 export interface OrderResponses {
   count: number;
@@ -126,26 +124,26 @@ export interface OrderResponses {
   rows: Array<OrderResponse>;
 }
 export interface OrderPreprocess {
-  checkinId: string;
+  checkinId?: string;
   externalOrderRef: string;
-  manuallyProcessed: boolean;
+  manuallyProcessed?: boolean;
   status: OrderStatus;
-  type: "delivery" | "pickup" | "dinein ";
-  revenueCentre: string;
-  notes: string;
-  requiredAt: string;
-  availableEta: string;
+  type: "delivery" | "pickup" | "dinein";
+  revenueCentre?: string;
+  notes?: string;
+  requiredAt?: string;
+  availableEta?: string;
   items: Array<ProductWithTaxes>;
   surcounts: Array<Surcount>;
-  taxes: Array<Tax>;
-  log: LogsRequest;
+  taxes?: Array<Tax>;
+  log?: LogsRequest;
 }
 export interface OrderRequest {
   order: OrderPreprocess;
   consumer: Consumer;
-  transactions: Array<TransactionRequest>;
-  members: Array<string>;
-  posTerminalId: string;
+  transactions?: Array<TransactionRequest>;
+  members?: Array<string>;
+  posTerminalId?: string;
 }
 
 export interface OrderRetrievalFilters {
@@ -337,22 +335,6 @@ export default class Order {
         "doshii-location-id": locationId,
       },
       data,
-    });
-  }
-
-  /**
-   * Retrieve all logs for an Order
-   * @param locationId hashed location ID of the location
-   * @param orderId Order ID to be retrieved
-   * @returns The audit logs for the order
-   */
-  async getLogs(locationId: string, orderId: string): Promise<LogsResponse> {
-    return await this.requestMaker({
-      url: `/orders/${orderId}/logs`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
     });
   }
 

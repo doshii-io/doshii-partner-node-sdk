@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import {
   sampleBookingResponses,
   sampleBookingResponse,
-  sampleLogsResponse,
   sampleOrderResponses,
   sampleOrderResponse,
   sampleCheckinRequest,
@@ -127,26 +126,6 @@ describe("Booking", () => {
     await expect(
       doshii.booking.get(locationId, "some0Booking234Id")
     ).rejects.toBeDefined();
-  });
-
-  test("Should request for booking logs", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleLogsResponse] });
-    const bookingId = "some0Booking5Id345";
-    await expect(
-      doshii.booking.getLogs(locationId, bookingId)
-    ).resolves.toMatchObject([sampleLogsResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/bookings/${bookingId}/logs`,
-    });
   });
 
   test("Should request for preorders with and without filters", async () => {
