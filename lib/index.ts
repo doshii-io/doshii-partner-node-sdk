@@ -199,7 +199,7 @@ export default class Doshii {
     this.apiKey = `${hasher.update(this.clientId).digest("hex")}:${appId}`;
   }
 
-  protected async submitRequest(data: AxiosRequestConfig) {
+  protected async submitRequest(data: AxiosRequestConfig): Promise<any> {
     const payload = {
       clientId: this.clientId,
       timestamp: Math.round(Date.now() / 1000),
