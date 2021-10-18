@@ -22,7 +22,7 @@ npm i doshii-sdk-2.0.0.tgz
 
 The `Doshii` constructor accepts credentials and is thereafter used for all the API calls.
 
-All the API's are properties of the main `Doshii` class, which can be invoked as required. The API s include `location`, `checkin`, `device`, `loyalty`, `menu`, `order`, `table`, `transaction`, `webhook` and `booking`.
+All the APIs are properties of the main `Doshii` class, which can be invoked as required. The API s include `location`, `checkin`, `device`, `loyalty`, `menu`, `order`, `table`, `transaction`, `webhook` and `booking`.
 
 ```node
 import Doshii, {LogLevel} from 'doshii-sdk'
@@ -79,7 +79,7 @@ doshii.unsubscribeFromAllWebsocketEvents();
 
 ### 2.2 Calling API s
 
-All API's conform to the [OPEN API specs](https://sandbox-dashboard.doshii.io/docs/api/app)
+All APIs conform to the [OPEN API specs](https://sandbox-dashboard.doshii.io/docs/api/app)
 
 ```node
 doshii.location
