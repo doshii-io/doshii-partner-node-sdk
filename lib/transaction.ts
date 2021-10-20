@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Surcount, LogsResponse } from "./sharedSchema";
+import { Surcount } from "./sharedSchema";
 
 type PaymentMethod =
   | "cash"
@@ -139,25 +139,6 @@ export default class Transaction {
   ): Promise<TransactionResponse> {
     return await this.requestMaker({
       url: `/transactions/${transactionId}`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-    });
-  }
-
-  /**
-   * Retrieve a list of logs for a Transaction
-   * @param locationId The hashed Location ID of the location you are interacting with
-   * @param transactionId ID of the transaction to be retrieved
-   * @returns audit logs for the transaction
-   */
-  async getLogs(
-    locationId: string,
-    transactionId: string
-  ): Promise<LogsResponse> {
-    return await this.requestMaker({
-      url: `/transactions/${transactionId}/logs`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId,

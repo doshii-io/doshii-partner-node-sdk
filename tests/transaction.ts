@@ -1,7 +1,7 @@
 import Doshii, { TransactionRequest, TransactionUpdate } from "../lib";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { sampleTransactionResponse, sampleLogsResponse } from "./sharedSamples";
+import { sampleTransactionResponse } from "./sharedSamples";
 jest.mock("axios");
 jest.mock("jsonwebtoken");
 
@@ -55,27 +55,6 @@ describe("Transaction", () => {
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/transactions/${transactionId}`,
-    });
-  });
-
-  test("Should request for a specific transaction logs", async () => {
-    const transactionId = "transactionI34";
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: [sampleLogsResponse],
-    });
-    await expect(
-      doshii.transaction.getLogs(locationId, transactionId)
-    ).resolves.toMatchObject([sampleLogsResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/transactions/${transactionId}/logs`,
     });
   });
 

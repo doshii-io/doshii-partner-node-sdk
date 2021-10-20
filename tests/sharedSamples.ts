@@ -52,7 +52,7 @@ export const sampleOrderRequest: OrderRequest = {
             description: "Item description",
             amount: 1000,
             type: "absolute",
-            value: "1000",
+            value: 1000,
           },
         ],
         taxes: [
@@ -103,7 +103,6 @@ export const sampleOrderRequest: OrderRequest = {
       },
     ],
     log: {
-      employeeId: 123,
       employeePosRef: "123",
       employeeName: "John Doe",
       deviceRef: "123",
@@ -179,7 +178,6 @@ export const sampleOrderResponse = {
       totalAfterSurcounts: "1100",
       lastAction: {
         logId: "f52e2b12-9b13-4113-bb49-3cfacad02545",
-        employeeId: "1",
         employeeName: "Fred Bloggs",
         employeePosRef: "432324tgr",
         deviceRef: "213-iPad",
@@ -446,7 +444,6 @@ export const sampleOrderResponse = {
   uri: "https://sandbox.doshii.co/partner/v3/orders/1634",
   transactionsUri:
     "https://sandbox.doshii.co/partner/v3/orders/1634/transactions",
-  log: "https://sandbox.doshii.co/partner/v3/orders/1634/logs",
 };
 
 export const sampleOrderResponses = {
@@ -481,7 +478,6 @@ export const sampleOrderResponses = {
           totalAfterSurcounts: "1100",
           lastAction: {
             logId: "f52e2b12-9b13-4113-bb49-3cfacad02545",
-            employeeId: "1",
             employeeName: "Fred Bloggs",
             employeePosRef: "432324tgr",
             deviceRef: "213-iPad",
@@ -748,7 +744,6 @@ export const sampleOrderResponses = {
       uri: "https://sandbox.doshii.co/partner/v3/orders/1634",
       transactionsUri:
         "https://sandbox.doshii.co/partner/v3/orders/1634/transactions",
-      log: "https://sandbox.doshii.co/partner/v3/orders/1634/logs",
     },
   ],
 };
@@ -917,7 +912,6 @@ export const sampleCheckinRequest = {
   covers: 4,
   completedAt: null,
   log: {
-    employeeId: 123,
     employeePosRef: "123",
     employeeName: "John Doe",
     deviceRef: "123",
@@ -939,24 +933,6 @@ export const sampleCheckinRequest = {
       notes: "string",
     },
   },
-};
-
-export const sampleLogsResponse = {
-  logId: "f52e2b12-9b13-4113-bb49-3cfacad02545",
-  employeeId: "1",
-  employeeName: "Fred Bloggs",
-  employeePosRef: "432324tgr",
-  deviceRef: "213-iPad",
-  deviceName: "Dining Room iPad 1",
-  area: "Dining Room",
-  appId: "12",
-  appName: "Fred's Cool Ordering App",
-  audit: "accepted => complete",
-  action: [
-    "Item ID (bd9e565a-affe-4f7d-9dc6-728151647af0) item_created",
-    "order_updated",
-  ],
-  performedAt: "2019-01-01T12:00:00.000Z",
 };
 
 export const sampleTransactionRequest = {

@@ -26,7 +26,6 @@ export interface CheckinRequest {
   covers?: number;
   completedAt?: string | null;
   log?: {
-    employeeId: number;
     employeePosRef: string;
     employeeName: string;
     deviceRef: string;
@@ -111,7 +110,7 @@ export default class Checkin {
    *
    * Retrieve Checkins for a Location
    * @param locationId The hashed Location ID of the location you are interacting with
-   * @param options Optional filters
+   * @param filters Optional filters
    *    status: String to return active or completed checkins, default is 'pending, accepted'
    *    tableName: Single table name
    *    from: Minimum checkin creation date and time (in Epoch-time), default is 60 mins ago
@@ -138,8 +137,8 @@ export default class Checkin {
    * @param checkinId The ID of the checkin you'd like to retrieve
    * @returns The requsted checkin
    */
-  async getOne(locationId: string, checkingId: string) {
-    return this.get(locationId, checkingId) as Promise<CheckinResponse>;
+  async getOne(locationId: string, checkinId: string) {
+    return this.get(locationId, checkinId) as Promise<CheckinResponse>;
   }
 
   /**

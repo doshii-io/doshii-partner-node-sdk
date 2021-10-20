@@ -8,7 +8,6 @@ import Doshii, {
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import {
-  sampleLogsResponse,
   sampleOrderRequest,
   sampleOrderResponse,
   sampleOrderResponses,
@@ -59,7 +58,7 @@ const sampleItemToAddToOrder: AddItemToOrderRequest = {
       description: "Item description",
       amount: 1000,
       type: "absolute",
-      value: "1000",
+      value: 1000,
     },
   ],
   taxes: [
@@ -140,7 +139,7 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
           description: "Item description",
           amount: 1000,
           type: "absolute",
-          value: "1000",
+          value: 1000,
         },
       ],
       taxes: [
@@ -191,7 +190,6 @@ const sampleOrderPreprocessRequest: OrderPreprocess = {
     },
   ],
   log: {
-    employeeId: 123,
     employeePosRef: "123",
     employeeName: "John Doe",
     deviceRef: "123",
@@ -322,7 +320,6 @@ describe("Order", () => {
       mealPhase: MealPhase.ORDERED,
       version: "12",
       log: {
-        employeeId: 123,
         employeePosRef: "123",
         employeeName: "John Doe",
         deviceRef: "123",
@@ -380,26 +377,6 @@ describe("Order", () => {
     });
   });
 
-  test("Should request for order logs", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleLogsResponse });
-    const orderId = "order124";
-    await expect(
-      doshii.order.getLogs(locationId, orderId)
-    ).resolves.toMatchObject(sampleLogsResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/logs`,
-    });
-  });
-
   test("Should request to add items to an order", async () => {
     const requestSpy = jest
       .spyOn(axios, "request")
@@ -430,7 +407,6 @@ describe("Order", () => {
       cancelledItems: ["string"],
       version: "iwgjr2NJ014",
       log: {
-        employeeId: 123,
         employeePosRef: "123",
         employeeName: "John Doe",
         deviceRef: "123",

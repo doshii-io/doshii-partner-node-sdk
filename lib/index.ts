@@ -48,7 +48,7 @@ import Checkin, {
 } from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
-import { LocationClasses, Product, LogsResponse, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
+import { LocationClasses, Product, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
 
 export enum WebsocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -199,7 +199,7 @@ export default class Doshii {
     this.apiKey = `${hasher.update(this.clientId).digest("hex")}:${appId}`;
   }
 
-  protected async submitRequest(data: AxiosRequestConfig) {
+  protected async submitRequest(data: AxiosRequestConfig): Promise<any> {
     const payload = {
       clientId: this.clientId,
       timestamp: Math.round(Date.now() / 1000),
@@ -539,7 +539,6 @@ export {
   TransactionResponse,
   TransactionUpdate,
   TransactionRequest,
-  LogsResponse,
   Surcount,
   ProductOptions,
   ProductOptionsVariant,

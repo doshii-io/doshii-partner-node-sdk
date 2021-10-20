@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { Surcount, LogsResponse, Product } from "./sharedSchema";
+import { Surcount, Product } from "./sharedSchema";
 
 interface LoyaltyMember {
   ref: string;
@@ -95,7 +95,6 @@ export interface LoyaltyCardResponse {
   posTerminalId: string;
   processedByApp: number;
   uri: string;
-  log: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -112,7 +111,6 @@ export interface LoyaltyCardRequest {
   reference: string;
   cancelledReason: string;
   log: {
-    employeeId: number;
     employeePosRef: string;
     employeeName: string;
     deviceRef: string;
@@ -146,7 +144,7 @@ export default class Loyalty {
    *    offset: Number of matching records to skip before returning the matches, default is 0
    *    limit: Max number of records to return, default is 50, max is 100 (1000 in read-only service)
    *    sort: Sort loyalty checkins ascending or descending based on creation date. Default is desc.
-   * @param returns The requested loyalty checkin
+   * @returns The requested loyalty checkin
    */
   async getCheckins(
     locationId: string,
@@ -188,7 +186,7 @@ export default class Loyalty {
    *    offset: Number of matching records to skip before returning the matches, default is 0
    *    limit: Max number of records to return, default is 50, max is 100 (1000 in read-only service)
    *    sort: Sort loyalty checkins ascending or descending based on creation date. Default is desc.
-   * @param returns The requested loyalty checkins
+   * @returns The requested loyalty checkins
    */
   async getAllCheckins(
     locationId: string,
@@ -208,8 +206,8 @@ export default class Loyalty {
   /**
    * Retrieve loyalty checkins registered by your application for a given location
    * @param locationId The hashed Location ID of the location you are interacting with
-   * @param checkInId ID of the loyalty checkin to retrieve, if not provided all the checkins are retrieved
-   * @param returns The requested loyalty checkin
+   * @param checkinId ID of the loyalty checkin to retrieve, if not provided all the checkins are retrieved
+   * @returns The requested loyalty checkin
    */
   async getOneCheckin(locationId: string, checkinId: string) {
     return this.getCheckins(
@@ -363,25 +361,6 @@ export default class Loyalty {
   }
 
   /**
-   * Retrieve all Logs for a Loyalty / Gift Card balance enquiry request. Data will be returned chronologically.
-   * @param locationId The hashed Location ID of the location you are interacting with
-   * @param requestId The ID of the enquiry request you'd like to retrieve
-   * @returns The audit logs for the request
-   */
-  async getCardEnquiryLogs(
-    locationId: string,
-    requestId: string
-  ): Promise<Array<LogsResponse>> {
-    return this.requestMaker({
-      url: `/loyalty/cards/enquiry/${requestId}/logs`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-    });
-  }
-
-  /**
    * Retrieve a request to activate a loyalty / gift card.
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param requestId The ID of the activation request you'd like to retrieve
@@ -419,25 +398,6 @@ export default class Loyalty {
         "doshii-location-id": locationId,
       },
       data,
-    });
-  }
-
-  /**
-   * Retrieve all Logs for a Loyalty / Gift Card Activation request. Data will be returned chronologically.
-   * @param locationId The hashed Location ID of the location you are interacting with
-   * @param requestId The ID of the activation request you'd like to retrieve
-   * @returns The audit logs for the request
-   */
-  async getCardActivationLogs(
-    locationId: string,
-    requestId: string
-  ): Promise<LogsResponse> {
-    return this.requestMaker({
-      url: `/loyalty/cards/activation/${requestId}/logs`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
     });
   }
 }
