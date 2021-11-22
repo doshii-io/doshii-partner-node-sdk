@@ -33,8 +33,10 @@ export default class Table {
    * this is ignore the filters
    * @param filters an optional object with the following filters
    *    id: List of table IDs.
-   *    isActive: etrieves all tables that have their isActive property matching the specified value.
+   *    isActive: Retrieves all tables that have their isActive property matching the specified value.
    *    covers: Retrieves all tables that have been configured to support at least the number of covers supplied.
+   *    openOrders: Retrieves all tables that are currently associated to open orders.
+   *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
   async get(
@@ -44,6 +46,8 @@ export default class Table {
       id?: Array<string>;
       isActive?: boolean;
       covers?: string;
+      openOrders?: boolean;
+      revenueCentre?: string;
     }
   ): Promise<Array<TableResponse> | TableResponse> {
     let req: AxiosRequestConfig = {
@@ -69,7 +73,7 @@ export default class Table {
   /**
    * Retrieve a specific Table
    * @param locationId The hashed Location ID of the location you are interacting with
-   * @param name: retrive using name
+   * @param name: retrieve using name
    * @returns the requested table
    */
   async getOne(locationId: string, name: string) {
@@ -81,8 +85,10 @@ export default class Table {
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param filters an optional object with the following filters
    *    id: List of table IDs.
-   *    isActive: etrieves all tables that have their isActive property matching the specified value.
+   *    isActive: Retrieves all tables that have their isActive property matching the specified value.
    *    covers: Retrieves all tables that have been configured to support at least the number of covers supplied.
+   *    openOrders: Retrieves all tables that are currently associated to open orders.
+   *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
   async getAll(
@@ -91,6 +97,8 @@ export default class Table {
       id?: Array<string>;
       isActive?: boolean;
       covers?: string;
+      openOrders?: boolean;
+      revenueCentre?: string;
     }
   ): Promise<Array<TableResponse>> {
     return this.get(locationId, undefined, filters) as Promise<
@@ -145,6 +153,8 @@ export default class Table {
    * Retrieve a list of all Orders that apply to a Table by the Tables' name
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param name The name of the table you'd like to retrieve orders for
+   * @param filters an optional object with the following filters
+   *    status: Retrieves all orders for the given table that have the supplied order status
    * @returns
    */
   async getOrders(
