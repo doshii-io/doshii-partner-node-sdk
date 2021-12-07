@@ -89,6 +89,8 @@ describe("Table", () => {
       id: ["124l", "dsf"],
       covers: "fdgsfg",
       isActive: true,
+      openOrders: true,
+      revenueCentre: "rev123"
     };
     await expect(
       doshii.table.getAll(locationId, params)
