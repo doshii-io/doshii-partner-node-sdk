@@ -8,7 +8,7 @@ export enum DoshiiEvents {
   EMPLOYEE_UPDATED = "employee_updated",
   EMPLOYEE_DELETED = "employee_deleted",
   TRANSACTION_CREATED = "transaction_created",
-  TRANSACTION_UPDATED = "tracsaction_updated",
+  TRANSACTION_UPDATED = "transaction_updated",
   REWARD_REDEEMED = "reward_redemption",
   POINTS_REDEEMED = "points_redemption",
   MENU_UPDATED = "menu_updated",
@@ -29,6 +29,13 @@ export enum DoshiiEvents {
   RESOURCE_DELETED = "resource_deleted",
   CARD_ACTIVATION_REQUESTED = "card_activate",
   CARD_ENQUIRY_REQUESTED = "card_enquiry",
+  APP_MENU_UPDATED = "app_menu_updated",
+  APP_MENU_ITEM_UPDATED = "app_menu_item_updated",
+  LOCATION_SUBSCRIPTION = "location_subscription",
+  LOCATION_HOURS_UPDATED = "location_hours_updated",
+  LOYALTY_CHECKIN_CREATED = "loyalty_checkin_created",
+  LOYALTY_CHECKIN_UPDATED = "loyalty_checkin_updated",
+  LOYALTY_CHECkIN_DELETED = "loyalty_checkin_deleted",
 }
 
 export interface WebhookRegister {
