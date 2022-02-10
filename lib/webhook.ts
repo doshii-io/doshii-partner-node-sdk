@@ -31,6 +31,11 @@ export enum DoshiiEvents {
   CARD_ENQUIRY_REQUESTED = "card_enquiry",
   APP_MENU_UPDATED = "app_menu_updated",
   APP_MENU_ITEM_UPDATED = "app_menu_item_updated",
+  LOCATION_SUBSCRIPTION = "location_subscription",
+  LOCATION_HOURS_UPDATED = "location_hours_updated",
+  LOYALTY_CHECKIN_CREATED = "loyalty_checkin_created",
+  LOYALTY_CHECKIN_UPDATED = "loyalty_checkin_updated",
+  LOYALTY_CHECkIN_DELETED = "loyalty_checkin_deleted",
 }
 
 export interface WebhookRegister {
