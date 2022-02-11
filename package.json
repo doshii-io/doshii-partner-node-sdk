@@ -1,6 +1,6 @@
 {
   "name": "doshii-partner-node-sdk",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "author": "Doshii",
   "description": "Module for Doshii partner APIs",
   "main": "dist/index.js",
