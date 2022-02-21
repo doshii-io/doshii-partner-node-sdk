@@ -75,7 +75,7 @@ export interface TransactionResponse {
   method: PaymentMethod;
   tip: number;
   trn: string;
-  surcount: Array<Surcount>;
+  surcounts: Array<Surcount>;
   id: string;
   orderId: string;
   acceptLess: boolean;
