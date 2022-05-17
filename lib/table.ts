@@ -36,7 +36,7 @@ export default class Table {
    *    isActive: Retrieves all tables that have their isActive property matching the specified value.
    *    covers: Retrieves all tables that have been configured to support at least the number of covers supplied.
    *    openOrders: Retrieves all tables that are currently associated to open orders.
-   *    allowVirtual: Retrieve virtual tables for some pos (such H&L) that have this concept. This parameter must be used in combination openOrders parameter.
+   *    allowVirtual: Retrieve virtual tables for some pos (such H&L) that have this concept. This parameter must be used in combination with the openOrders parameter.
    *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
@@ -95,6 +95,7 @@ export default class Table {
    *    isActive: Retrieves all tables that have their isActive property matching the specified value.
    *    covers: Retrieves all tables that have been configured to support at least the number of covers supplied.
    *    openOrders: Retrieves all tables that are currently associated to open orders.
+   *    allowVirtual: Retrieve virtual tables for some pos (such H&L) that have this concept. This parameter must be used in combination with the openOrders parameter.
    *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
@@ -105,6 +106,7 @@ export default class Table {
       isActive?: boolean;
       covers?: string;
       openOrders?: boolean;
+      allowVirtual?: boolean;
       revenueCentre?: string;
     }
   ): Promise<Array<TableResponse>> {
