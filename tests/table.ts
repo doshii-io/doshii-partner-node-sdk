@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import {
   sampleOrderResponse,
   sampleBookingResponses,
-  sampleCheckinResponse,
+  sampleCheckinResponse
 } from "./sharedSamples";
 
 jest.mock("axios");
@@ -20,11 +20,11 @@ const sampleTableResponse = {
     isCommunal: true,
     canMerge: true,
     isSmoking: false,
-    isOutdoor: false,
+    isOutdoor: false
   },
   updatedAt: "2019-01-01T12:00:00.000Z",
   createdAt: "2019-01-01T12:00:00.000Z",
-  uri: "https://sandbox.doshii.co/partner/v3/tables/table1",
+  uri: "https://sandbox.doshii.co/partner/v3/tables/table1"
 };
 
 describe("Table", () => {
@@ -45,17 +45,17 @@ describe("Table", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
     await expect(doshii.table.getAll(locationId)).resolves.toMatchObject([
-      sampleTableResponse,
+      sampleTableResponse
     ]);
     expect(requestSpy).toBeCalledWith({
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables",
+      url: "/tables"
     });
     expect(authSpy).toBeCalledTimes(1);
   });
@@ -72,11 +72,11 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}`,
+      url: `/tables/${tableName}`
     });
     expect(authSpy).toBeCalledTimes(1);
   });
@@ -99,12 +99,70 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: "/tables",
-      params,
+      params
+    });
+  });
+  test("Should request for tables and virtual tables", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
+    const params = {
+      id: ["124l", "dsf"],
+      covers: "fdgsfg",
+      isActive: true,
+      openOrders: true,
+      allowVirtual: true,
+      revenueCentre: "rev123"
+    };
+    await expect(
+      doshii.table.getAll(locationId, params)
+    ).resolves.toMatchObject([sampleTableResponse]);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json"
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables",
+      params
+    });
+  });
+  test("Should remove parameter allowVirtual if openOrders not true", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
+    const params = {
+      id: ["124l", "dsf"],
+      covers: "fdgsfg",
+      isActive: true,
+      allowVirtual: true,
+      revenueCentre: "rev123"
+    };
+    await expect(
+      doshii.table.getAll(locationId, params)
+    ).resolves.toMatchObject([sampleTableResponse]);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json"
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables",
+      params: {
+        id: ["124l", "dsf"],
+        covers: "fdgsfg",
+        isActive: true,
+        revenueCentre: "rev123"
+      }
     });
   });
 
@@ -120,16 +178,16 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/bookings`,
+      url: `/tables/${tableName}/bookings`
     });
 
     const filters = {
       status: BookingStatus.ACCEPTED,
-      seated: false,
+      seated: false
     };
     await expect(
       doshii.table.getBookings(locationId, tableName, filters)
@@ -138,12 +196,12 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/tables/${tableName}/bookings`,
-      params: filters,
+      params: filters
     });
   });
 
@@ -159,11 +217,11 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/checkins`,
+      url: `/tables/${tableName}/checkins`
     });
   });
 
@@ -179,15 +237,15 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/orders`,
+      url: `/tables/${tableName}/orders`
     });
 
     const filters = {
-      status: OrderStatus.PENDING,
+      status: OrderStatus.PENDING
     };
     await expect(
       doshii.table.getOrders(locationId, tableName, filters)
@@ -196,12 +254,12 @@ describe("Table", () => {
       headers: {
         "doshii-location-id": locationId,
         authorization: "Bearer signedJwt",
-        "content-type": "application/json",
+        "content-type": "application/json"
       },
       method: "GET",
       baseURL: "https://sandbox.doshii.co/partner/v3",
       url: `/tables/${tableName}/orders`,
-      params: filters,
+      params: filters
     });
   });
 });
