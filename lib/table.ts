@@ -36,6 +36,7 @@ export default class Table {
    *    isActive: Retrieves all tables that have their isActive property matching the specified value.
    *    covers: Retrieves all tables that have been configured to support at least the number of covers supplied.
    *    openOrders: Retrieves all tables that are currently associated to open orders.
+   *    allowVirtual: Retrieve virtual tables for some pos (such H&L) that have this concept. This parameter must be used in combination openOrders parameter.
    *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
@@ -47,25 +48,31 @@ export default class Table {
       isActive?: boolean;
       covers?: string;
       openOrders?: boolean;
+      allowVirtual?: boolean;
       revenueCentre?: string;
     }
   ): Promise<Array<TableResponse> | TableResponse> {
     let req: AxiosRequestConfig = {
       method: "GET",
       headers: {
-        "doshii-location-id": locationId,
-      },
+        "doshii-location-id": locationId
+      }
     };
+
+    if (filters?.allowVirtual === true && filters?.openOrders !== true) {
+      delete filters.allowVirtual;
+    }
+
     if (name) {
       return this.requestMaker({
         ...req,
-        url: `/tables/${name}`,
+        url: `/tables/${name}`
       });
     } else {
       return this.requestMaker({
         ...req,
         url: "/tables",
-        params: filters,
+        params: filters
       });
     }
   }
@@ -125,9 +132,9 @@ export default class Table {
       url: `/tables/${name}/bookings`,
       method: "GET",
       headers: {
-        "doshii-location-id": locationId,
+        "doshii-location-id": locationId
       },
-      params: filters,
+      params: filters
     });
   }
   /**
@@ -144,8 +151,8 @@ export default class Table {
       url: `/tables/${name}/checkins`,
       method: "GET",
       headers: {
-        "doshii-location-id": locationId,
-      },
+        "doshii-location-id": locationId
+      }
     });
   }
 
@@ -168,9 +175,9 @@ export default class Table {
       url: `/tables/${name}/orders`,
       method: "GET",
       headers: {
-        "doshii-location-id": locationId,
+        "doshii-location-id": locationId
       },
-      params: filters,
+      params: filters
     });
   }
 }
