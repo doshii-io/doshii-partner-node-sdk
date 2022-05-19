@@ -48,7 +48,13 @@ import Checkin, {
 } from "./checkin";
 
 import { LogLevel, Logger } from "./utils";
-import { LocationClasses, Product, Surcount, ProductOptions, ProductOptionsVariant } from "./sharedSchema";
+import {
+  LocationClasses,
+  Product,
+  Surcount,
+  ProductOptions,
+  ProductOptionsVariant,
+} from "./sharedSchema";
 
 export enum WebsocketEvents {
   ORDER_UPDATED = "order_updated",
@@ -128,6 +134,7 @@ export default class Doshii {
   private readonly clientSecret: string;
   private readonly sandbox: boolean;
   private readonly url: string;
+  private readonly websocketUrlOverride: string | undefined;
   private readonly logger: Logger;
   private readonly pingInterval: number = 30000;
 
@@ -164,6 +171,8 @@ export default class Doshii {
       apiVersion?: number;
       logLevel?: LogLevel;
       pingInterval?: number;
+      apiUrlOverride?: string;
+      websocketUrlOverride?: string;
     }
   ) {
     this.logger = options?.logLevel
@@ -173,10 +182,11 @@ export default class Doshii {
     this.clientSecret = clientSecret;
     const apiVersion = options?.apiVersion ? options.apiVersion : 3;
     this.sandbox = options?.sandbox ? options.sandbox : false;
-    this.url = this.sandbox
-      ? `https://sandbox.doshii.co/partner/v${apiVersion}`
-      : `https://live.doshii.co/partner/v${apiVersion}`;
-
+    this.url =
+      options?.apiUrlOverride ?? this.sandbox
+        ? `https://sandbox.doshii.co/partner/v${apiVersion}`
+        : `https://live.doshii.co/partner/v${apiVersion}`;
+    this.websocketUrlOverride = options?.websocketUrlOverride;
     this.location = new Location(this.submitRequest.bind(this));
     this.order = new Order(this.submitRequest.bind(this));
     this.device = new Device(this.submitRequest.bind(this));
@@ -221,9 +231,10 @@ export default class Doshii {
   }
 
   private websocketSetup(sandbox: boolean) {
-    const wsUrl = sandbox
-      ? "wss://sandbox-socket.doshii.co/app/socket?auth="
-      : "wss://live-socket.doshii.co/app/socket?auth=";
+    const wsUrl =
+      this.websocketUrlOverride ?? sandbox
+        ? "wss://sandbox-socket.doshii.co/app/socket?auth="
+        : "wss://live-socket.doshii.co/app/socket?auth=";
     const auth = Buffer.from(this.clientId).toString("base64");
     // debugging
     // const wsUrl = "wss://echo.websocket.org";
