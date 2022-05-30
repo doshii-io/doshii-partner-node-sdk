@@ -183,9 +183,9 @@ export default class Doshii {
     const apiVersion = options?.apiVersion ? options.apiVersion : 3;
     this.sandbox = options?.sandbox ? options.sandbox : false;
     this.url =
-      options?.apiUrlOverride ?? this.sandbox
+      options?.apiUrlOverride ?? (this.sandbox
         ? `https://sandbox.doshii.co/partner/v${apiVersion}`
-        : `https://live.doshii.co/partner/v${apiVersion}`;
+        : `https://live.doshii.co/partner/v${apiVersion}`);
     this.websocketUrlOverride = options?.websocketUrlOverride;
     this.location = new Location(this.submitRequest.bind(this));
     this.order = new Order(this.submitRequest.bind(this));
@@ -232,9 +232,9 @@ export default class Doshii {
 
   private websocketSetup(sandbox: boolean) {
     const wsUrl =
-      this.websocketUrlOverride ?? sandbox
+      this.websocketUrlOverride ?? (sandbox
         ? "wss://sandbox-socket.doshii.co/app/socket?auth="
-        : "wss://live-socket.doshii.co/app/socket?auth=";
+        : "wss://live-socket.doshii.co/app/socket?auth=");
     const auth = Buffer.from(this.clientId).toString("base64");
     // debugging
     // const wsUrl = "wss://echo.websocket.org";
