@@ -225,7 +225,10 @@ export default class Doshii {
         },
       });
       return resp.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        delete error.config?.headers?.authorization;
+      }
       throw error;
     }
   }
