@@ -46,6 +46,7 @@ import Checkin, {
   CheckinRequest,
   CheckinResponse,
 } from "./checkin";
+import Employee, { EmployeeResponse } from "./employee";
 
 import { LogLevel, Logger } from "./utils";
 import {
@@ -161,6 +162,7 @@ export default class Doshii {
   readonly menu: Menu;
   readonly loyalty: Loyalty;
   readonly checkin: Checkin;
+  readonly employee: Employee;
 
   constructor(
     clientId: string,
@@ -197,6 +199,7 @@ export default class Doshii {
     this.menu = new Menu(this.submitRequest.bind(this));
     this.loyalty = new Loyalty(this.submitRequest.bind(this));
     this.checkin = new Checkin(this.submitRequest.bind(this));
+    this.employee = new Employee(this.submitRequest.bind(this));
 
     if (options?.appId) this.generateApiKey(options.appId);
 
@@ -574,4 +577,5 @@ export {
   MealPhase,
   DeliveryStatus,
   AddItemToOrderRequest,
+  EmployeeResponse
 };
