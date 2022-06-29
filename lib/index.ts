@@ -47,6 +47,7 @@ import Checkin, {
   CheckinResponse,
 } from "./checkin";
 import Employee, { EmployeeResponse } from "./employee";
+import Referral, { ReferralResponse } from "./referral";
 
 import { LogLevel, Logger } from "./utils";
 import {
@@ -163,6 +164,7 @@ export default class Doshii {
   readonly loyalty: Loyalty;
   readonly checkin: Checkin;
   readonly employee: Employee;
+  readonly referral: Referral;
 
   constructor(
     clientId: string,
@@ -200,6 +202,7 @@ export default class Doshii {
     this.loyalty = new Loyalty(this.submitRequest.bind(this));
     this.checkin = new Checkin(this.submitRequest.bind(this));
     this.employee = new Employee(this.submitRequest.bind(this));
+    this.referral = new Referral(this.submitRequest.bind(this));
 
     if (options?.appId) this.generateApiKey(options.appId);
 
@@ -577,5 +580,6 @@ export {
   MealPhase,
   DeliveryStatus,
   AddItemToOrderRequest,
-  EmployeeResponse
+  EmployeeResponse,
+  ReferralResponse
 };
