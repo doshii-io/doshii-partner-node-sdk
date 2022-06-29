@@ -219,7 +219,7 @@ export default class Order {
    * when getting all orders
    * @returns list of orders
    */
-  async get(
+  private async get(
     locationId: string,
     orderId?: string,
     filters?: OrderRetrievalFilters

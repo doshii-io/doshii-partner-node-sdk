@@ -567,7 +567,7 @@ describe("Menu", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleMenuResponse });
-    await expect(doshii.menu.get(locationId)).resolves.toMatchObject(
+    await expect(doshii.menu.getMenu(locationId)).resolves.toMatchObject(
       sampleMenuResponse
     );
     expect(requestSpy).toBeCalledWith({
@@ -582,7 +582,7 @@ describe("Menu", () => {
     });
 
     await expect(
-      doshii.menu.get(locationId, {
+      doshii.menu.getMenu(locationId, {
         lastVersion: "v2",
         filtered: true,
       })

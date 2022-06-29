@@ -98,6 +98,37 @@ export default class Menu {
   }
 
   /**
+   * Retrieve Menu, Product, Options or Surcounts for a Location by its hashed ID
+   * @param locationId The hashed Location ID of the location you are interacting with
+   * @param posId The POS ID of the product
+   * @param options Optional object with the following filters
+   *    lastVersion: A hash of the last version of the menu to determine if there have been any changes since.
+   *    filtered: Indicates whether or not to retrieve a filtered view of the menu based on the requesting App.
+   * @param childResource The resource to get that falls under Menu in the heirarchy of the RESTful API 
+   * @returns The requested location's Menu, Product, Options or Surcounts
+   */
+  private async get(
+    locationId: string,
+    posId?: string,
+    options?: {
+      lastVersion?: string;
+      filtered?: boolean;
+    },
+    childResource?: string
+  ): Promise<MenuResponse | MenuProduct | MenuOptions | Surcount> {
+    const url = !childResource ? `/locations/${locationId}/menu` : `/locations/${locationId}/menu/${childResource}/${posId}`;
+
+    return await this.requestMaker({
+      url,
+      method: "GET",
+      headers: {
+        "doshii-location-id": locationId,
+      },
+      params: options,
+    });
+  }
+
+  /**
    * Retrieve a Menu for a Location by its hashed ID
    * @param locationId The hashed Location ID of the location you are interacting with
    * @param options Optional object with the following filters
@@ -105,21 +136,14 @@ export default class Menu {
    *    filtered: Indicates whether or not to retrieve a filtered view of the menu based on the requesting App.
    * @returns The requested location's menu
    */
-  async get(
+  async getMenu(
     locationId: string,
     options?: {
       lastVersion?: string;
       filtered?: boolean;
     }
   ): Promise<MenuResponse> {
-    return await this.requestMaker({
-      url: `/locations/${locationId}/menu`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      params: options,
-    });
+    return this.get(locationId, "", options, "") as Promise<MenuResponse>;
   }
 
   /**
@@ -137,14 +161,9 @@ export default class Menu {
       filtered: boolean;
     }
   ): Promise<MenuProduct> {
-    return await this.requestMaker({
-      url: `/locations/${locationId}/menu/products/${posId}`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      params: options,
-    });
+    const resourceToGet = "products";
+
+    return this.get(locationId, posId, options, resourceToGet) as Promise<MenuProduct>;
   }
 
   /**
@@ -162,14 +181,9 @@ export default class Menu {
       filtered: boolean;
     }
   ): Promise<MenuOptions> {
-    return await this.requestMaker({
-      url: `/locations/${locationId}/menu/options/${posId}`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      params: options,
-    });
+    const resourceToGet = "options";
+
+    return this.get(locationId, posId, options, resourceToGet) as Promise<MenuOptions>;
   }
 
   /**
@@ -187,13 +201,8 @@ export default class Menu {
       filtered: boolean;
     }
   ): Promise<Surcount> {
-    return await this.requestMaker({
-      url: `/locations/${locationId}/menu/surcounts/${posId}`,
-      method: "GET",
-      headers: {
-        "doshii-location-id": locationId,
-      },
-      params: options,
-    });
+    const resourceToGet = "surcounts";
+
+    return this.get(locationId, posId, options, resourceToGet) as Promise<Surcount>;
   }
 }

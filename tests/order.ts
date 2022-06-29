@@ -257,7 +257,7 @@ describe("Order", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleOrderResponses });
     await expect(
-      doshii.order.get(locationId, "", {
+      doshii.order.getAll(locationId, {
         status: [OrderStatus.PENDING, OrderStatus.ACCEPTED],
         posRef: "pos234",
         externalOrderRef: "order234",
