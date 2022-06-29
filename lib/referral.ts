@@ -17,7 +17,7 @@ export interface ReferralRequest {
   partnerLocationId?: string;
   doshiiLocationId?: string;
   doshiiOrganisationId?: string;
-  address: {
+  address?: {
     line1: string;
     line2?: string;
     city: string;
