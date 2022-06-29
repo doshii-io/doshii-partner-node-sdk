@@ -107,7 +107,7 @@ export default class Location {
    * If not provided all the linked locations are returned
    * @returns the location details
    */
-  async get(
+  private async get(
     locationId?: string
   ): Promise<Array<LocationResponse> | LocationResponse> {
     let requestData: AxiosRequestConfig = {

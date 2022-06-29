@@ -140,7 +140,8 @@ describe("Location", () => {
     jest
       .spyOn(axios, "request")
       .mockRejectedValue({ status: 500, error: "failed" });
-    await expect(doshii.location.get()).rejects.toBeDefined();
+    await expect(doshii.location.getAll()).rejects.toBeDefined();
+    await expect(doshii.location.getOne(locationId)).rejects.toBeDefined();
   });
 
   test("Should request for health of all locations with and without filters", async () => {

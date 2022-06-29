@@ -47,7 +47,7 @@ export default class Device {
    * all the registered devices
    * @returns a list of devices or just once device if deviceId id provided
    */
-  async get(
+   private async get(
     deviceId?: string
   ): Promise<Array<DeviceResponse> | DeviceResponse> {
     let url = "/devices";

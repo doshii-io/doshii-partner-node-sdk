@@ -71,7 +71,7 @@ export default class Checkin {
    *    limit: Max number of records to return, default is 50, max is 250
    * @returns The checkins that match the criteria
    */
-  async get(
+   private async get(
     locationId: string,
     checkinId?: string,
     filters?: CheckinRetrievalFilters

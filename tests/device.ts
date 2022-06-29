@@ -42,6 +42,7 @@ describe("Device", () => {
   let doshii: Doshii;
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
+  const deviceId = "some0Booking5Id345";
   let authSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -151,7 +152,6 @@ describe("Device", () => {
       status: 200,
       data: { message: "The requested device has been removed" },
     });
-    const deviceId = "some0Booking5Id345";
     await expect(
       doshii.device.unregisterDevice(deviceId)
     ).resolves.toMatchObject({
@@ -172,6 +172,7 @@ describe("Device", () => {
     jest
       .spyOn(axios, "request")
       .mockRejectedValue({ status: 500, error: "failed" });
-    await expect(doshii.device.get()).rejects.toBeDefined();
+    await expect(doshii.device.getAll()).rejects.toBeDefined();
+    await expect(doshii.device.getOne(deviceId)).rejects.toBeDefined();
   });
 });
