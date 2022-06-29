@@ -19,6 +19,7 @@ describe("Employee", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
+  const posEmployeeId = "Employee123";
   let authSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -54,7 +55,6 @@ describe("Employee", () => {
     const requestSpy = jest
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleEmployeeResponse });
-    const posEmployeeId = "Employee123";
 
     await expect(
       doshii.employee.getOne(locationId, posEmployeeId)
@@ -79,6 +79,7 @@ describe("Employee", () => {
       .spyOn(axios, "request")
       .mockRejectedValue({ status: 500, error: "failed" });
 
-    await expect(doshii.employee.get(locationId)).rejects.toBeDefined();
+    await expect(doshii.employee.getOne(locationId, posEmployeeId)).rejects.toBeDefined();
+    await expect(doshii.employee.getAll(locationId)).rejects.toBeDefined();
   });
 });

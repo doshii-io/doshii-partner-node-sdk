@@ -103,7 +103,8 @@ describe("Check in", () => {
     jest
       .spyOn(axios, "request")
       .mockRejectedValue({ status: 500, error: "failed" });
-    await expect(doshii.checkin.get(locationId)).rejects.toBeDefined();
+    await expect(doshii.checkin.getAll(locationId)).rejects.toBeDefined();
+    await expect(doshii.checkin.getOne(locationId, checkinId)).rejects.toBeDefined();
   });
 
   test("Should request for checkin orders", async () => {

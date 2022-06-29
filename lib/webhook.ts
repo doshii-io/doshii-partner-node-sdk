@@ -88,7 +88,7 @@ export default class Webhook {
    * If not provided all the registered webhooks are retrieved
    * @returns a list of webhooks or just once webhook if event is provided
    */
-  async get(
+  private async get(
     event?: DoshiiEvents
   ): Promise<Array<WebhookResponse> | WebhookResponse> {
     return await this.requestMaker({

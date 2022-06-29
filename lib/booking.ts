@@ -66,7 +66,7 @@ export default class Booking {
    *  limit: Max number of records to return, default is 50, max is 250
    * @returns bookings for a location
    */
-  async get(
+  private async get(
     locationId: string,
     bookingId?: string,
     filters?: {

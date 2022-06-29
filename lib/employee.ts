@@ -16,7 +16,7 @@ export default class Employee {
         this.requestMaker = requestMaker;
     }
 
-    async get(
+    private async get(
         locationId: string,
         posEmployeeId?: string
     ): Promise<Array<EmployeeResponse> | EmployeeResponse> {

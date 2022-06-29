@@ -104,7 +104,7 @@ describe("Booking", () => {
       .spyOn(axios, "request")
       .mockResolvedValue({ status: 200, data: sampleBookingResponse });
     await expect(
-      doshii.booking.get(locationId, "some0Booking234Id")
+      doshii.booking.getOne(locationId, "some0Booking234Id")
     ).resolves.toMatchObject(sampleBookingResponse);
     expect(requestSpy).toBeCalledWith({
       headers: {
@@ -124,7 +124,10 @@ describe("Booking", () => {
       .spyOn(axios, "request")
       .mockRejectedValue({ status: 500, error: "failed" });
     await expect(
-      doshii.booking.get(locationId, "some0Booking234Id")
+      doshii.booking.getAll(locationId)
+    ).rejects.toBeDefined();
+    await expect(
+      doshii.booking.getOne(locationId, "some0Booking234Id")
     ).rejects.toBeDefined();
   });
 

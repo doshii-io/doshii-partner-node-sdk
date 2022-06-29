@@ -40,7 +40,7 @@ export default class Table {
    *    revenueCentre: Retrieves all tables that have been linked to the supplied revenue centre within the POS.
    * @returns List of Tables for a Location
    */
-  async get(
+  private async get(
     locationId: string,
     name?: string,
     filters?: {
