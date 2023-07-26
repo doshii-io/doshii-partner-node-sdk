@@ -66,7 +66,7 @@ export default class Table {
     if (name) {
       return this.requestMaker({
         ...req,
-        url: `/tables/${name}`
+        url: `/tables/${encodeURIComponent(name)}`
       });
     } else {
       return this.requestMaker({
@@ -131,7 +131,7 @@ export default class Table {
     }
   ): Promise<BookingResponses> {
     return await this.requestMaker({
-      url: `/tables/${name}/bookings`,
+      url: `/tables/${encodeURIComponent(name)}/bookings`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId
@@ -150,7 +150,7 @@ export default class Table {
     name: string
   ): Promise<Array<CheckinResponse>> {
     return await this.requestMaker({
-      url: `/tables/${name}/checkins`,
+      url: `/tables/${encodeURIComponent(name)}/checkins`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId
@@ -174,7 +174,7 @@ export default class Table {
     }
   ): Promise<Array<OrderResponse>> {
     return await this.requestMaker({
-      url: `/tables/${name}/orders`,
+      url: `/tables/${encodeURIComponent(name)}/orders`,
       method: "GET",
       headers: {
         "doshii-location-id": locationId

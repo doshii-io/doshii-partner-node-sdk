@@ -262,4 +262,77 @@ describe("Table", () => {
       params: filters
     });
   });
+
+  test("Should retrieve a table by encoding the table name with a special character", async () => {
+    const tableName = "table1/table2";
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleTableResponse });
+    await doshii.table.getOne(locationId, tableName);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables/table1%2Ftable2",
+    });
+    expect(authSpy).toBeCalledTimes(1);
+  });
+
+  test("Should correctly format table order request to encode table name with a special character", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleOrderResponse] });
+    const tableName = "table1/table2";
+    await doshii.table.getOrders(locationId, tableName);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables/table1%2Ftable2/orders",
+    });
+  });
+
+  test("Should correctly format table checkin request to encode table name with a special character", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
+    const tableName = "table1/table2";
+    await doshii.table.getCheckins(locationId, tableName);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables/table1%2Ftable2/checkins",
+    });
+  });
+
+  test("Should correctly format table booking request to encode table name with a special character", async () => {
+    const requestSpy = jest
+      .spyOn(axios, "request")
+      .mockResolvedValue({ status: 200, data: sampleBookingResponses });
+    const tableName = "table1/table2";
+    await doshii.table.getBookings(locationId, tableName);
+    expect(requestSpy).toBeCalledWith({
+      headers: {
+        "doshii-location-id": locationId,
+        authorization: "Bearer signedJwt",
+        "content-type": "application/json",
+      },
+      method: "GET",
+      baseURL: "https://sandbox.doshii.co/partner/v3",
+      url: "/tables/table1%2Ftable2/bookings",
+    });
+  });  
 });
