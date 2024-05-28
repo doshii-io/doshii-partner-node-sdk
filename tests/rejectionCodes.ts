@@ -1,8 +1,8 @@
 import Doshii from "../lib";
-import axios from "axios";
+import nock from "nock";
+import _ from "lodash";
 import jwt from "jsonwebtoken";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleResponse = {
@@ -15,49 +15,53 @@ describe("Rejection codes", () => {
   let doshii: Doshii;
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for all rejection codes", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/rejection_codes`).reply(200, [sampleResponse]);
+
     await expect(doshii.getRejectionCodes()).resolves.toMatchObject([
       sampleResponse,
     ]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/rejection_codes",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a specific rejection code", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleResponse });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/rejection_codes/01`).reply(200, sampleResponse);
+
     await expect(doshii.getRejectionCodes("01")).resolves.toMatchObject(
       sampleResponse
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/rejection_codes/01",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 });

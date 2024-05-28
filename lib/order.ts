@@ -250,6 +250,8 @@ export default class Order {
           params.posFrom = Math.floor(filters.posFrom.getTime() / 1000);
         if (filters.posTo)
           params.posTo = Math.floor(filters.posTo.getTime() / 1000);
+        if (filters.status)
+          params.status = filters.status.join(',')
       }
       requestData = { ...requestData, url: "/orders", params };
     }

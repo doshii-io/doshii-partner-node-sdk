@@ -72,7 +72,12 @@ export default class Table {
       return this.requestMaker({
         ...req,
         url: "/tables",
-        params: filters
+        params: {
+          ...filters,
+          ...(filters?.id ? {
+            id: filters.id.join(',')
+          } : {})
+        }
       });
     }
   }

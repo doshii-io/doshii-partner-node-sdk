@@ -1,8 +1,8 @@
 import Doshii, { TransactionRequest, TransactionUpdate } from "../lib";
-import axios from "axios";
+import nock from "nock";
+import _ from "lodash";
 import jwt from "jsonwebtoken";
 import { sampleTransactionResponse } from "./sharedSamples";
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 describe("Transaction", () => {
@@ -10,52 +10,55 @@ describe("Transaction", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    "doshii-location-id": locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for order transactions", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTransactionResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/orders/someOrderId/transactions`).reply(200, [sampleTransactionResponse]);
+
     await expect(
       doshii.transaction.getOrderTransactions(locationId, "someOrderId")
     ).resolves.toMatchObject([sampleTransactionResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/orders/someOrderId/transactions",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+    
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a specific transaction", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleTransactionResponse });
     const transactionId = "transactionI34";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/transactions/${transactionId}`).reply(200, sampleTransactionResponse);
+
     await expect(
       doshii.transaction.getTransaction(locationId, transactionId)
     ).resolves.toMatchObject(sampleTransactionResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/transactions/${transactionId}`,
-    });
   });
 
   test("Should request for a new transaction", async () => {
@@ -79,10 +82,11 @@ describe("Transaction", () => {
         },
       ],
     };
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: sampleTransactionResponse,
-    });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).post(`/partner/v3/orders/someOrderId/transactions`, _.matches(sampleCreateTransaction)).reply(200, sampleTransactionResponse);
+
     await expect(
       doshii.transaction.createTransaction(
         locationId,
@@ -90,17 +94,6 @@ describe("Transaction", () => {
         sampleCreateTransaction
       )
     ).resolves.toMatchObject(sampleTransactionResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/someOrderId/transactions`,
-      data: sampleCreateTransaction,
-    });
   });
 
   test("Should request for a transaction update", async () => {
@@ -135,11 +128,13 @@ describe("Transaction", () => {
         imageUri: "string",
       },
     };
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: sampleTransactionResponse,
-    });
+
     const transactionId = "transactionI234";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).put(`/partner/v3/transactions/${transactionId}`, _.matches(sampleUpdateTransaction)).reply(200, sampleTransactionResponse);
+
     await expect(
       doshii.transaction.updateTransaction(
         locationId,
@@ -147,16 +142,5 @@ describe("Transaction", () => {
         sampleUpdateTransaction
       )
     ).resolves.toMatchObject(sampleTransactionResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "PUT",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/transactions/${transactionId}`,
-      data: sampleUpdateTransaction,
-    });
   });
 });

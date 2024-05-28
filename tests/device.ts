@@ -1,8 +1,8 @@
 import Doshii, { DoshiiEvents, DeviceRegister, DeviceUpdate } from "../lib";
-import axios from "axios";
 import jwt from "jsonwebtoken";
+import nock from "nock";
+import _ from "lodash";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleResponse = {
@@ -43,57 +43,58 @@ describe("Device", () => {
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
   const deviceId = "some0Booking5Id345";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for all devices in a location", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get('/partner/v3/devices').reply(200, [sampleResponse]);
+
     await expect(doshii.device.getAll()).resolves.toMatchObject([
       sampleResponse,
     ]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      method: "GET",
-      url: "/devices",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a specific device in a location", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleResponse });
     const deviceId = "some0Location5Id9";
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/devices/${deviceId}`).reply(200, sampleResponse);
+
     await expect(doshii.device.getOne(deviceId)).resolves.toMatchObject(
       sampleResponse
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      method: "GET",
-      url: `/devices/${deviceId}`,
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a new device registration", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleRegisterDeviceResponse });
     const data: DeviceRegister = {
       name: "test device",
       ref: "345klwejfskle",
@@ -102,25 +103,17 @@ describe("Device", () => {
       channels: ["Pay@Table"],
       locationIds: ["2345ert"],
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).post(`/partner/v3/devices`, _.matches(data)).reply(200, sampleRegisterDeviceResponse);
+
     await expect(doshii.device.registerDevice(data)).resolves.toMatchObject(
       sampleRegisterDeviceResponse
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      data,
-      method: "POST",
-      url: `/devices`,
-    });
   });
 
   test("Should request for device update", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleUpdateDeviceResponse });
     const deviceId = "some0Booking5Id345";
     const data: DeviceUpdate = {
       name: "test device",
@@ -132,46 +125,33 @@ describe("Device", () => {
       doshiiId: "345345",
       version: "43fsdt34t",
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).put(`/partner/v3/devices/${deviceId}`, _.matches(data)).reply(200, sampleUpdateDeviceResponse);
+
     await expect(
       doshii.device.updateDevice(deviceId, data)
     ).resolves.toMatchObject(sampleUpdateDeviceResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      data,
-      method: "PUT",
-      url: `/devices/${deviceId}`,
-    });
   });
 
   test("Should requset for device removal", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: { message: "The requested device has been removed" },
-    });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).delete(`/partner/v3/devices/${deviceId}`).reply(200, { message: "The requested device has been removed" });
+
     await expect(
       doshii.device.unregisterDevice(deviceId)
     ).resolves.toMatchObject({
       message: "The requested device has been removed",
     });
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      method: "DELETE",
-      url: `/devices/${deviceId}`,
-    });
   });
 
   test("Should reject the promise if request fails", async () => {
-    jest
-      .spyOn(axios, "request")
-      .mockRejectedValue({ status: 500, error: "failed" });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(() => true).reply(500);
+    
     await expect(doshii.device.getAll()).rejects.toBeDefined();
     await expect(doshii.device.getOne(deviceId)).rejects.toBeDefined();
   });
