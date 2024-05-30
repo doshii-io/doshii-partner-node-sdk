@@ -1,8 +1,8 @@
 import Doshii from "../lib";
-import axios from "axios";
 import jwt from "jsonwebtoken";
+import nock from "nock";
+import _ from "lodash";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleMenuResponse = {
@@ -555,31 +555,51 @@ describe("Menu", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    "doshii-location-id": locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for menu with or without options", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleMenuResponse });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/locations/${locationId}/menu`).reply(200, sampleMenuResponse);
+
     await expect(doshii.menu.getMenu(locationId)).resolves.toMatchObject(
       sampleMenuResponse
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu`,
-    });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/locations/${locationId}/menu`)
+    .query({
+      lastVersion: "v2",
+      filtered: true,
+    })
+    .reply(200, sampleMenuResponse);
 
     await expect(
       doshii.menu.getMenu(locationId, {
@@ -587,104 +607,66 @@ describe("Menu", () => {
         filtered: true,
       })
     ).resolves.toMatchObject(sampleMenuResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu`,
-      params: {
-        lastVersion: "v2",
-        filtered: true,
-      },
-    });
 
-    expect(authSpy).toBeCalledTimes(2);
+    expect(jwt.sign).toBeCalledTimes(2);
   });
 
   test("Should request for products with or without options", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleMenuProductResponse });
     const posId = "345sd";
+    
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/locations/${locationId}/menu/products/${posId}`).reply(200, sampleMenuProductResponse);
+
     await expect(
       doshii.menu.getProduct(locationId, posId)
     ).resolves.toMatchObject(sampleMenuProductResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/products/${posId}`,
-    });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/locations/${locationId}/menu/products/${posId}`)
+    .query({
+      filtered: false,
+    })
+    .reply(200, sampleMenuProductResponse);
 
     await expect(
       doshii.menu.getProduct(locationId, posId, {
         filtered: false,
       })
     ).resolves.toBeDefined();
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/products/${posId}`,
-      params: {
-        filtered: false,
-      },
-    });
 
-    expect(authSpy).toBeCalledTimes(2);
+    expect(jwt.sign).toBeCalledTimes(2);
   });
 
   test("Should request for products options with or without filters", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleMenuOption });
     const posId = "345sd";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/locations/${locationId}/menu/options/${posId}`).reply(200, sampleMenuOption);
+
     await expect(
       doshii.menu.getProductOptions(locationId, posId)
     ).resolves.toMatchObject(sampleMenuOption);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/options/${posId}`,
-    });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/locations/${locationId}/menu/options/${posId}`)
+    .query({
+      filtered: false,
+    })
+    .reply(200, sampleMenuOption);
 
     await expect(
       doshii.menu.getProductOptions(locationId, posId, {
         filtered: false,
       })
     ).resolves.toMatchObject(sampleMenuOption);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/options/${posId}`,
-      params: {
-        filtered: false,
-      },
-    });
 
-    expect(authSpy).toBeCalledTimes(2);
+    expect(jwt.sign).toBeCalledTimes(2);
   });
 
   test("Should request for surcounts with or without filters", async () => {
@@ -694,43 +676,32 @@ describe("Menu", () => {
       amount: -10,
       type: "percentage",
     };
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: response });
+
     const posId = "345sd";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/locations/${locationId}/menu/surcounts/${posId}`).reply(200, response);
+
     await expect(
       doshii.menu.getSurcounts(locationId, posId)
     ).resolves.toMatchObject(response);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/surcounts/${posId}`,
-    });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/locations/${locationId}/menu/surcounts/${posId}`)
+    .query({
+      filtered: false,
+    })
+    .reply(200, response);
 
     await expect(
       doshii.menu.getSurcounts(locationId, posId, {
         filtered: false,
       })
     ).resolves.toMatchObject(response);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/menu/surcounts/${posId}`,
-      params: {
-        filtered: false,
-      },
-    });
 
-    expect(authSpy).toBeCalledTimes(2);
+    expect(jwt.sign).toBeCalledTimes(2);
   });
 });

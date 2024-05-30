@@ -5,7 +5,8 @@ import Doshii, {
   AddItemToOrderRequest,
   OrderPreprocess,
 } from "../lib";
-import axios from "axios";
+import nock from "nock";
+import _ from "lodash";
 import jwt from "jsonwebtoken";
 import {
   sampleOrderRequest,
@@ -15,7 +16,6 @@ import {
   sampleTransactionResponse,
 } from "./sharedSamples";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleItemToAddToOrder: AddItemToOrderRequest = {
@@ -203,59 +203,76 @@ describe("Order", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    "doshii-location-id": locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for all orders", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponses });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/orders`).reply(200, sampleOrderResponses);
+
     await expect(doshii.order.getAll(locationId)).resolves.toMatchObject(
       sampleOrderResponses
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/orders",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a specific order", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponse });
     const orderId = "Order324";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/orders/${orderId}`).reply(200, sampleOrderResponse);
+
     await expect(
       doshii.order.getOne(locationId, orderId)
     ).resolves.toMatchObject(sampleOrderResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}`,
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for orders with filters", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponses });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/orders`)
+    .query({
+      from: 1609459200,
+      to: 1609545600,
+      posFrom: 1609459200,
+      posTo: 1609545600,
+      sort: "asc",
+      posRef: "pos234",
+      externalOrderRef: "order234",
+      status: [OrderStatus.PENDING, OrderStatus.ACCEPTED].join(','),
+    })
+    .reply(200, sampleOrderResponses);
+
     await expect(
       doshii.order.getAll(locationId, {
         status: [OrderStatus.PENDING, OrderStatus.ACCEPTED],
@@ -268,53 +285,23 @@ describe("Order", () => {
         sort: "asc",
       })
     ).resolves.toMatchObject(sampleOrderResponses);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/orders",
-      params: {
-        from: 1609459200,
-        to: 1609545600,
-        posFrom: 1609459200,
-        posTo: 1609545600,
-        sort: "asc",
-        posRef: "pos234",
-        externalOrderRef: "order234",
-        status: [OrderStatus.PENDING, OrderStatus.ACCEPTED],
-      },
-    });
   });
 
   test("Should request for new order creation", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponse });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .post(`/partner/v3/orders`, _.matches(sampleOrderRequest))
+    .reply(200, sampleOrderResponse);
+
     await expect(
       doshii.order.createOrder(locationId, sampleOrderRequest)
     ).resolves.toMatchObject(sampleOrderResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/orders",
-      data: sampleOrderRequest,
-    });
   });
 
   test("Should request for order update", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponses });
     const orderId = "order124";
+
     const data = {
       status: OrderStatus.ACCEPTED,
       mealPhase: MealPhase.ORDERED,
@@ -328,26 +315,18 @@ describe("Order", () => {
       },
     };
 
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .put(`/partner/v3/orders/${orderId}`, _.matches(data))
+    .reply(200, sampleOrderResponses);
+
     await expect(
       doshii.order.update(locationId, orderId, data)
     ).resolves.toBeDefined();
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "PUT",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}`,
-      data,
-    });
   });
 
   test("Should request for order delivery update", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponse });
     const data = {
       deliveryOrderId: "string",
       displayId: "string",
@@ -361,47 +340,33 @@ describe("Order", () => {
       version: "1",
     };
     const orderId = "order124";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .put(`/partner/v3/orders/${orderId}/delivery`, _.matches(data))
+    .reply(200, sampleOrderResponse);
+
     await expect(
       doshii.order.updateDelivery(locationId, orderId, data)
     ).resolves.toMatchObject(sampleOrderResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "PUT",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/delivery`,
-      data,
-    });
   });
 
   test("Should request to add items to an order", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponse });
     const orderId = "234re";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .post(`/partner/v3/orders/${orderId}/items`, _.matches([sampleItemToAddToOrder]))
+    .reply(200, sampleOrderResponse);
+
     await expect(
       doshii.order.addItems(locationId, orderId, [sampleItemToAddToOrder])
     ).resolves.toMatchObject(sampleOrderResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/items`,
-      data: [sampleItemToAddToOrder],
-    });
   });
 
   test("Should request to remove items from an order", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleOrderResponse });
     const orderId = "order124";
     const data = {
       cancelledItems: ["string"],
@@ -414,20 +379,16 @@ describe("Order", () => {
         area: "Main dining hall",
       },
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .delete(`/partner/v3/orders/${orderId}/items`, _.matches(data))
+    .reply(200, sampleOrderResponse);
+
     await expect(
       doshii.order.removeItems(locationId, orderId, data)
     ).resolves.toMatchObject(sampleOrderResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "DELETE",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/items`,
-      data,
-    });
   });
 
   test("Should request to preprocess order", async () => {
@@ -437,30 +398,27 @@ describe("Order", () => {
       status: "pending",
       createdAt: "2019-01-01T12:00:00.000Z",
     };
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: response });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .post(`/partner/v3/orders/preprocess`, _.matches(sampleOrderPreprocessRequest))
+    .reply(200, response);
+
     await expect(
       doshii.order.preprocess(locationId, sampleOrderPreprocessRequest)
     ).resolves.toMatchObject(response);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/preprocess`,
-      data: sampleOrderPreprocessRequest,
-    });
   });
 
   test("Should request to create transaction from an order", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleTransactionResponse });
     const orderId = "order234";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .post(`/partner/v3/orders/${orderId}/transactions`, _.matches(sampleTransactionRequest))
+    .reply(200, sampleTransactionResponse);
+
     await expect(
       doshii.order.createTransaction(
         locationId,
@@ -468,36 +426,19 @@ describe("Order", () => {
         sampleTransactionRequest
       )
     ).resolves.toMatchObject(sampleTransactionResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/transactions`,
-      data: sampleTransactionRequest,
-    });
   });
 
   test("Should request transactions for an order", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTransactionResponse] });
     const orderId = "order234";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/orders/${orderId}/transactions`)
+    .reply(200, [sampleTransactionResponse]);
+
     await expect(
       doshii.order.getTransactions(locationId, orderId)
     ).resolves.toMatchObject([sampleTransactionResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/orders/${orderId}/transactions`,
-    });
   });
 });

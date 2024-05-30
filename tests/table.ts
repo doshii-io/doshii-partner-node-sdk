@@ -1,5 +1,6 @@
 import Doshii, { BookingStatus, OrderStatus } from "../lib";
-import axios from "axios";
+import nock from "nock";
+import _ from "lodash";
 import jwt from "jsonwebtoken";
 
 import {
@@ -8,7 +9,6 @@ import {
   sampleCheckinResponse
 } from "./sharedSamples";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleTableResponse = {
@@ -32,59 +32,60 @@ describe("Table", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    "doshii-location-id": locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json"
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for all tables", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/tables`).reply(200, [sampleTableResponse]);
+
     await expect(doshii.table.getAll(locationId)).resolves.toMatchObject([
       sampleTableResponse
     ]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables"
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for one table", async () => {
     const tableName = "table1";
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleTableResponse });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/tables/${tableName}`).reply(200, sampleTableResponse);
+
     await expect(
       doshii.table.getOne(locationId, tableName)
     ).resolves.toMatchObject(sampleTableResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}`
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for tables with options", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
     const params = {
       id: ["124l", "dsf"],
       covers: "fdgsfg",
@@ -92,25 +93,26 @@ describe("Table", () => {
       openOrders: true,
       revenueCentre: "rev123"
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables`)
+    .query({
+      id: ["124l", "dsf"].join(','),
+      covers: "fdgsfg",
+      isActive: true,
+      openOrders: true,
+      revenueCentre: "rev123"
+    })
+    .reply(200, [sampleTableResponse]);
+
     await expect(
       doshii.table.getAll(locationId, params)
     ).resolves.toMatchObject([sampleTableResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables",
-      params
-    });
   });
+
   test("Should request for tables and virtual tables", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
     const params = {
       id: ["124l", "dsf"],
       covers: "fdgsfg",
@@ -119,25 +121,27 @@ describe("Table", () => {
       allowVirtual: true,
       revenueCentre: "rev123"
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables`)
+    .query({
+      id: ["124l", "dsf"].join(','),
+      covers: "fdgsfg",
+      isActive: true,
+      openOrders: true,
+      allowVirtual: true,
+      revenueCentre: "rev123"
+    })
+    .reply(200, [sampleTableResponse]);
+
     await expect(
       doshii.table.getAll(locationId, params)
     ).resolves.toMatchObject([sampleTableResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables",
-      params
-    });
   });
+
   test("Should remove parameter allowVirtual if openOrders not true", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleTableResponse] });
     const params = {
       id: ["124l", "dsf"],
       covers: "fdgsfg",
@@ -145,194 +149,146 @@ describe("Table", () => {
       allowVirtual: true,
       revenueCentre: "rev123"
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables`)
+    .query({
+      id: ["124l", "dsf"].join(','),
+      covers: "fdgsfg",
+      isActive: true,
+      revenueCentre: "rev123"
+    })
+    .reply(200, [sampleTableResponse]);
+
     await expect(
       doshii.table.getAll(locationId, params)
     ).resolves.toMatchObject([sampleTableResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables",
-      params: {
-        id: ["124l", "dsf"],
-        covers: "fdgsfg",
-        isActive: true,
-        revenueCentre: "rev123"
-      }
-    });
   });
 
   test("Should request for table bookings with or without filters", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleBookingResponses });
     const tableName = "table1";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/${tableName}/bookings`)
+    .reply(200, sampleBookingResponses);
+
     await expect(
       doshii.table.getBookings(locationId, tableName)
     ).resolves.toMatchObject(sampleBookingResponses);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/bookings`
-    });
 
     const filters = {
       status: BookingStatus.ACCEPTED,
       seated: false
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/${tableName}/bookings`)
+    .query({
+      status: BookingStatus.ACCEPTED,
+      seated: false
+    })
+    .reply(200, sampleBookingResponses);
+
     await expect(
       doshii.table.getBookings(locationId, tableName, filters)
     ).resolves.toMatchObject(sampleBookingResponses);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/bookings`,
-      params: filters
-    });
   });
 
   test("Should request for table checkins", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
     const tableName = "table1";
+    
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/${tableName}/checkins`)
+    .reply(200, [sampleCheckinResponse]);
+
     await expect(
       doshii.table.getCheckins(locationId, tableName)
     ).resolves.toMatchObject([sampleCheckinResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/checkins`
-    });
   });
 
   test("Should request for table orders with or without filters", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleOrderResponse] });
     const tableName = "table1";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/${tableName}/orders`)
+    .reply(200, [sampleOrderResponse]);
+
     await expect(
       doshii.table.getOrders(locationId, tableName)
     ).resolves.toMatchObject([sampleOrderResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/orders`
-    });
 
     const filters = {
       status: OrderStatus.PENDING
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/${tableName}/orders`)
+    .query(filters)
+    .reply(200, [sampleOrderResponse]);
+
     await expect(
       doshii.table.getOrders(locationId, tableName, filters)
     ).resolves.toMatchObject([sampleOrderResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json"
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/tables/${tableName}/orders`,
-      params: filters
-    });
   });
 
   test("Should retrieve a table by encoding the table name with a special character", async () => {
     const tableName = "table1/table2";
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleTableResponse });
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/table1%2Ftable2`)
+    .reply(200, sampleTableResponse);
+
     await doshii.table.getOne(locationId, tableName);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables/table1%2Ftable2",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should correctly format table order request to encode table name with a special character", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleOrderResponse] });
     const tableName = "table1/table2";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/table1%2Ftable2/orders`)
+    .reply(200, [sampleOrderResponse]);
+
     await doshii.table.getOrders(locationId, tableName);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables/table1%2Ftable2/orders",
-    });
   });
 
   test("Should correctly format table checkin request to encode table name with a special character", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleCheckinResponse] });
     const tableName = "table1/table2";
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/table1%2Ftable2/checkins`)
+    .reply(200, [sampleCheckinResponse]);
+
     await doshii.table.getCheckins(locationId, tableName);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables/table1%2Ftable2/checkins",
-    });
   });
 
   test("Should correctly format table booking request to encode table name with a special character", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleBookingResponses });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/tables/table1%2Ftable2/bookings`)
+    .reply(200, sampleBookingResponses);
+
     const tableName = "table1/table2";
     await doshii.table.getBookings(locationId, tableName);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/tables/table1%2Ftable2/bookings",
-    });
   });  
 });

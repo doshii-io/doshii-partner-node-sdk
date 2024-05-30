@@ -1,8 +1,8 @@
 import Doshii from "../lib";
-import axios from "axios";
 import jwt from "jsonwebtoken";
+import nock from "nock";
+import _ from "lodash";
 
-jest.mock("axios");
 jest.mock("jsonwebtoken");
 
 const sampleLocationResponse = {
@@ -89,79 +89,97 @@ describe("Location", () => {
   const locationId = "some0Location5Id9";
   const clientId = "some23Clients30edID";
   const clientSecret = "su234perDu[erse-898cret-09";
-  let authSpy: jest.SpyInstance;
+  const SERVER_BASE_URL = `https://sandbox.doshii.co`;
+  const REQUEST_HEADERS = {
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+  const REQUEST_HEADERS_WITH_LOCATION = {
+    "doshii-location-id": locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+  const REQUEST_HEADERS_WITH_HASHED_LOCATION = {
+    hashedLocationId: locationId,
+    authorization: "Bearer signedJwt",
+    "content-type": "application/json",
+  };
+
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+    nock.enableNetConnect();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     doshii = new Doshii(clientId, clientSecret, { sandbox: true });
-    authSpy = jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+    jest.spyOn(jwt, "sign").mockImplementation(() => "signedJwt");
+  });
+
+  afterEach(() => {
+    nock.isDone();
+    nock.cleanAll();
   });
 
   test("Should request for all locations", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleLocationResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(`/partner/v3/locations`).reply(200, [sampleLocationResponse]);
+
     await expect(doshii.location.getAll()).resolves.toMatchObject([
       sampleLocationResponse,
     ]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/locations",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for a specific location", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleLocationResponse });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_LOCATION,
+    }).get(`/partner/v3/locations/${locationId}`).reply(200, sampleLocationResponse);
+
     await expect(doshii.location.getOne(locationId)).resolves.toMatchObject(
       sampleLocationResponse
     );
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}`,
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should reject the promise if request fails", async () => {
-    jest
-      .spyOn(axios, "request")
-      .mockRejectedValue({ status: 500, error: "failed" });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    }).get(() => true).reply(500);
     await expect(doshii.location.getAll()).rejects.toBeDefined();
     await expect(doshii.location.getOne(locationId)).rejects.toBeDefined();
   });
 
   test("Should request for health of all locations with and without filters", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: [sampleLocationHealthResponse] });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/health/locations`)
+    .reply(200, [sampleLocationHealthResponse]);
+
     await expect(doshii.location.getHealth()).resolves.toMatchObject([
       sampleLocationHealthResponse,
     ]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/health/locations`,
-    });
 
     // with filters
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS,
+    })
+    .get(`/partner/v3/health/locations`)
+    .query({
+      since: 1609459200,
+      inverse: false,
+      sort: "asc",
+    })
+    .reply(200, [sampleLocationHealthResponse]);
+
     await expect(
       doshii.location.getAllHealths({
         since: new Date(Date.UTC(2021, 0, 1)),
@@ -169,142 +187,89 @@ describe("Location", () => {
         sort: "asc",
       })
     ).resolves.toMatchObject([sampleLocationHealthResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/health/locations`,
-      params: {
-        since: 1609459200,
-        inverse: false,
-        sort: "asc",
-      },
-    });
-    expect(authSpy).toBeCalledTimes(2);
+
+    expect(jwt.sign).toBeCalledTimes(2);
   });
 
   test("Should request for health of one specific location", async () => {
-    const requestSpy = jest
-      .spyOn(axios, "request")
-      .mockResolvedValue({ status: 200, data: sampleLocationHealthResponse });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_LOCATION,
+    })
+    .get(`/partner/v3/health/locations/${locationId}`)
+    .reply(200, sampleLocationHealthResponse);
+
     await expect(
       doshii.location.getOneHealth(locationId)
     ).resolves.toMatchObject(sampleLocationHealthResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/health/locations/${locationId}`,
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for all terminals at location", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: [sampleLocationTerminalResponse],
-    });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_LOCATION,
+    })
+    .get(`/partner/v3/terminals`)
+    .reply(200, [sampleLocationTerminalResponse]);
+
     await expect(
       doshii.location.getAllTerminals(locationId)
     ).resolves.toMatchObject([sampleLocationTerminalResponse]);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: "/terminals",
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for one specific terminal at location", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: sampleLocationTerminalResponse,
-    });
     const terminalId = "terdfasdio908324";
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_LOCATION,
+    })
+    .get(`/partner/v3/terminals/${terminalId}`)
+    .reply(200, sampleLocationTerminalResponse);
+
     await expect(
       doshii.location.getOneTerminal(locationId, terminalId)
     ).resolves.toMatchObject(sampleLocationTerminalResponse);
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        "doshii-location-id": locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "GET",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/terminals/${terminalId}`,
-    });
-    expect(authSpy).toBeCalledTimes(1);
+
+    expect(jwt.sign).toBeCalledTimes(1);
   });
 
   test("Should request for location subscription", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: { message: "Successfully subscribed" },
-    });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_HASHED_LOCATION,
+    })
+    .post(`/partner/v3/locations/${locationId}/subscription`)
+    .reply(200, { message: "Successfully subscribed" });
+
     await expect(
       doshii.location.subscribeTo(locationId)
     ).resolves.toMatchObject({ message: "Successfully subscribed" });
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        hashedLocationId: locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/subscription`,
-    });
 
     const data = {
       mappedLocationId: "12345",
       useFilteredMenu: true,
     };
+
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_HASHED_LOCATION,
+    })
+    .post(`/partner/v3/locations/${locationId}/subscription`, _.matches(data))
+    .reply(200, { message: "Successfully subscribed" });
+
     await expect(
       doshii.location.subscribeTo(locationId, data)
     ).resolves.toMatchObject({ message: "Successfully subscribed" });
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        hashedLocationId: locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "POST",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/subscription`,
-      data,
-    });
   });
 
   test("Should request for location unsubscription", async () => {
-    const requestSpy = jest.spyOn(axios, "request").mockResolvedValue({
-      status: 200,
-      data: { message: "Successfully unsubscribed" },
-    });
+    nock(SERVER_BASE_URL, {
+      reqheaders: REQUEST_HEADERS_WITH_HASHED_LOCATION,
+    })
+    .delete(`/partner/v3/locations/${locationId}/subscription`)
+    .reply(200, { message: "Successfully unsubscribed" });
+
     await expect(
       doshii.location.unSubscribeFrom(locationId)
     ).resolves.toMatchObject({ message: "Successfully unsubscribed" });
-    expect(requestSpy).toBeCalledWith({
-      headers: {
-        hashedLocationId: locationId,
-        authorization: "Bearer signedJwt",
-        "content-type": "application/json",
-      },
-      method: "DELETE",
-      baseURL: "https://sandbox.doshii.co/partner/v3",
-      url: `/locations/${locationId}/subscription`,
-    });
   });
 });
