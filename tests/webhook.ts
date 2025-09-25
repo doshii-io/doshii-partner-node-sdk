@@ -60,7 +60,7 @@ describe("Webhook", () => {
       sampleResponse,
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific webhook location", async () => {
@@ -72,7 +72,7 @@ describe("Webhook", () => {
       doshii.webhook.getFromLocation(locationId)
     ).resolves.toMatchObject(sampleResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific webhook", async () => {
@@ -84,7 +84,7 @@ describe("Webhook", () => {
       doshii.webhook.getOne(DoshiiEvents.BOOKING_CREATED)
     ).resolves.toMatchObject(sampleResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a new webhook registration", async () => {

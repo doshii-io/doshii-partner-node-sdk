@@ -78,7 +78,7 @@ describe("Device", () => {
       sampleResponse,
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific device in a location", async () => {
@@ -91,7 +91,7 @@ describe("Device", () => {
       sampleResponse
     );
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a new device registration", async () => {

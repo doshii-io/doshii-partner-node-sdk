@@ -52,7 +52,7 @@ describe("Check in", () => {
       sampleCheckinResponse,
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific checkin", async () => {
@@ -64,7 +64,7 @@ describe("Check in", () => {
       doshii.checkin.getOne(locationId, checkinId)
     ).resolves.toMatchObject(sampleCheckinResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should pass on the filters as params for retrieving checkins", async () => {

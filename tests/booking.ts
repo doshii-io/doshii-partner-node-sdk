@@ -104,7 +104,7 @@ describe("Booking", () => {
       doshii.booking.getAll(locationId, filters)
     ).resolves.toMatchObject(sampleBookingResponses);
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 
   test("Should request for a specific booking", async () => {
@@ -116,7 +116,7 @@ describe("Booking", () => {
       doshii.booking.getOne(locationId, "some0Booking234Id")
     ).resolves.toMatchObject(sampleBookingResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should reject the promise if request fails", async () => {

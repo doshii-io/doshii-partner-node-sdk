@@ -608,7 +608,7 @@ describe("Menu", () => {
       })
     ).resolves.toMatchObject(sampleMenuResponse);
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 
   test("Should request for products with or without options", async () => {
@@ -637,7 +637,7 @@ describe("Menu", () => {
       })
     ).resolves.toBeDefined();
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 
   test("Should request for products options with or without filters", async () => {
@@ -666,7 +666,7 @@ describe("Menu", () => {
       })
     ).resolves.toMatchObject(sampleMenuOption);
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 
   test("Should request for surcounts with or without filters", async () => {
@@ -702,6 +702,6 @@ describe("Menu", () => {
       })
     ).resolves.toMatchObject(response);
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 });

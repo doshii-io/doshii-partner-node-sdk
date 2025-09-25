@@ -239,7 +239,7 @@ describe("Order", () => {
       sampleOrderResponses
     );
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific order", async () => {
@@ -253,7 +253,7 @@ describe("Order", () => {
       doshii.order.getOne(locationId, orderId)
     ).resolves.toMatchObject(sampleOrderResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for orders with filters", async () => {
