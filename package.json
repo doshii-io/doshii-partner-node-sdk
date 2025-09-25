@@ -14,6 +14,9 @@
     "build": "rimraf dist && tsc",
     "test": "jest"
   },
+  "engines": {
+    "node": ">=18"
+  },  
   "keywords": [
     "Doshii",
     "Doshii SDK",
