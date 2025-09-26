@@ -89,7 +89,7 @@ describe("Bulk data", () => {
       doshii.requestBulkDataAggregation("orders", data, "someAppId")
     ).resolves.toMatchObject(sampleResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for the status for previously submitted data aggregation request", async () => {
@@ -124,6 +124,6 @@ describe("Bulk data", () => {
       doshii.getBulkDataAggregationStatus("someRequestId", "orders")
     ).resolves.toMatchObject(sampleResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 });

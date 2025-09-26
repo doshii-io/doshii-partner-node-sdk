@@ -50,7 +50,7 @@ describe("Rejection codes", () => {
       sampleResponse,
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific rejection code", async () => {
@@ -62,6 +62,6 @@ describe("Rejection codes", () => {
       sampleResponse
     );
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 });

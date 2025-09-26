@@ -428,7 +428,7 @@ describe("Loyalty", () => {
       doshii.loyalty.getAllCheckins(locationId)
     ).resolves.toMatchObject([sampleLoyaltyCheckinResponse]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific checkin", async () => {
@@ -443,7 +443,7 @@ describe("Loyalty", () => {
       doshii.loyalty.getOneCheckin(locationId, checkinId)
     ).resolves.toMatchObject(sampleLoyaltyCheckinResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should pass on the options as params for retrieving checkins", async () => {

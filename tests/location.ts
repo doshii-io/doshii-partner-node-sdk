@@ -134,7 +134,7 @@ describe("Location", () => {
       sampleLocationResponse,
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific location", async () => {
@@ -146,7 +146,7 @@ describe("Location", () => {
       sampleLocationResponse
     );
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should reject the promise if request fails", async () => {
@@ -188,7 +188,7 @@ describe("Location", () => {
       })
     ).resolves.toMatchObject([sampleLocationHealthResponse]);
 
-    expect(jwt.sign).toBeCalledTimes(2);
+    expect(jwt.sign).toHaveBeenCalledTimes(2);
   });
 
   test("Should request for health of one specific location", async () => {
@@ -202,7 +202,7 @@ describe("Location", () => {
       doshii.location.getOneHealth(locationId)
     ).resolves.toMatchObject(sampleLocationHealthResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for all terminals at location", async () => {
@@ -216,7 +216,7 @@ describe("Location", () => {
       doshii.location.getAllTerminals(locationId)
     ).resolves.toMatchObject([sampleLocationTerminalResponse]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for one specific terminal at location", async () => {
@@ -231,7 +231,7 @@ describe("Location", () => {
       doshii.location.getOneTerminal(locationId, terminalId)
     ).resolves.toMatchObject(sampleLocationTerminalResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for location subscription", async () => {

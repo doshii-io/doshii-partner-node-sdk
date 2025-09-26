@@ -56,7 +56,7 @@ describe("Employee", () => {
       sampleEmployeeResponse
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific employee", async () => {
@@ -68,7 +68,7 @@ describe("Employee", () => {
       doshii.employee.getOne(locationId, posEmployeeId)
     ).resolves.toMatchObject(sampleEmployeeResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should reject the promise if request fails", async () => {

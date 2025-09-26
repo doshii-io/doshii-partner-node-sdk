@@ -68,7 +68,7 @@ describe("Table", () => {
       sampleTableResponse
     ]);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for one table", async () => {
@@ -82,7 +82,7 @@ describe("Table", () => {
       doshii.table.getOne(locationId, tableName)
     ).resolves.toMatchObject(sampleTableResponse);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for tables with options", async () => {
@@ -254,7 +254,7 @@ describe("Table", () => {
 
     await doshii.table.getOne(locationId, tableName);
 
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should correctly format table order request to encode table name with a special character", async () => {

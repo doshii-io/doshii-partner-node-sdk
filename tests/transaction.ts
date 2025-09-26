@@ -46,7 +46,7 @@ describe("Transaction", () => {
       doshii.transaction.getOrderTransactions(locationId, "someOrderId")
     ).resolves.toMatchObject([sampleTransactionResponse]);
     
-    expect(jwt.sign).toBeCalledTimes(1);
+    expect(jwt.sign).toHaveBeenCalledTimes(1);
   });
 
   test("Should request for a specific transaction", async () => {
