@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { OrderResponse, OrderStatus } from "./order";
 import { BookingResponses, BookingStatus } from "./booking";
 import { CheckinResponse } from "./checkin";
@@ -20,9 +20,9 @@ export interface TableResponse {
 }
 
 export default class Table {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
@@ -52,7 +52,7 @@ export default class Table {
       revenueCentre?: string;
     }
   ): Promise<Array<TableResponse> | TableResponse> {
-    let req: AxiosRequestConfig = {
+    let req: RequestConfig = {
       method: "GET",
       headers: {
         "doshii-location-id": locationId
