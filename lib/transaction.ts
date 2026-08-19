@@ -27,6 +27,7 @@ export interface TransactionRequest {
   linkedTrxId?: string;
   method: PaymentMethod;
   tip?: number;
+  cashoutAmount?: number;
   trn?: string;
   prepaid: boolean;
   surcounts?: Array<Surcount>;
@@ -38,6 +39,7 @@ export interface TransactionUpdate {
   invoice?: string;
   method?: PaymentMethod;
   tip?: number;
+  cashoutAmount?: number;
   trn?: string;
   prepaid?: boolean;
   surcounts?: Array<Surcount>;
@@ -74,6 +76,7 @@ export interface TransactionResponse {
   linkedTrxId: string;
   method: PaymentMethod;
   tip: number;
+  cashoutAmount?: number;
   trn: string;
   surcounts: Array<Surcount>;
   id: string;
