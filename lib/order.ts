@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { CheckinResponse } from "./checkin";
 import {
   Consumer,
@@ -183,9 +183,9 @@ export interface OrderRetrievalFilters {
 }
 
 export default class Order {
-  private readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  private readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
@@ -224,7 +224,7 @@ export default class Order {
     orderId?: string,
     filters?: OrderRetrievalFilters
   ): Promise<OrderResponse | OrderResponses> {
-    let requestData: AxiosRequestConfig = {
+    let requestData: RequestConfig = {
       headers: {
         "doshii-location-id": locationId,
       },

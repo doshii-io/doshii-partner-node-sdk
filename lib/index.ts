@@ -1,4 +1,3 @@
-import axios, { AxiosRequestConfig } from "axios";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import WebSocket from "ws";
@@ -49,6 +48,7 @@ import Checkin, {
 import Employee, { EmployeeResponse } from "./employee";
 
 import { LogLevel, Logger } from "./utils";
+import { RequestConfig, request } from "./http";
 import {
   LocationClasses,
   Product,
@@ -212,25 +212,20 @@ export default class Doshii {
     this.apiKey = `${hasher.update(this.clientId).digest("hex")}:${appId}`;
   }
 
-  protected async submitRequest(data: AxiosRequestConfig): Promise<any> {
+  protected async submitRequest(data: RequestConfig): Promise<any> {
     const payload = {
       clientId: this.clientId,
       timestamp: Math.round(Date.now() / 1000),
     };
-    try {
-      const resp = await axios.request({
-        ...data,
-        baseURL: this.url,
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${jwt.sign(payload, this.clientSecret)}`,
-          ...data.headers,
-        },
-      });
-      return resp.data;
-    } catch (error) {
-      throw error;
-    }
+    return request({
+      ...data,
+      baseURL: this.url,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${jwt.sign(payload, this.clientSecret)}`,
+        ...data.headers,
+      },
+    });
   }
 
   private websocketSetup(sandbox: boolean) {

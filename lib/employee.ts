@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 
 export interface EmployeeResponse {
     locationId: string;
@@ -10,9 +10,9 @@ export interface EmployeeResponse {
 }
 
 export default class Employee {
-    readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+    readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-    constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+    constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
         this.requestMaker = requestMaker;
     }
 
@@ -20,7 +20,7 @@ export default class Employee {
         locationId: string,
         posEmployeeId?: string
     ): Promise<Array<EmployeeResponse> | EmployeeResponse> {
-        const req: AxiosRequestConfig = {
+        const req: RequestConfig = {
             method: "GET",
             headers: {
                 "doshii-location-id": locationId,
