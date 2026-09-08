@@ -69,6 +69,7 @@ describe("Transaction", () => {
       linkedTrxId: "123",
       method: "cash",
       tip: 500,
+      cashoutAmount: 200,
       trn: "100412786589",
       prepaid: true,
       surcounts: [
@@ -105,6 +106,7 @@ describe("Transaction", () => {
       invoice: "123",
       method: "cash",
       tip: 500,
+      cashoutAmount: 200,
       trn: "100412786589",
       prepaid: true,
       rejectionCode: "P1",

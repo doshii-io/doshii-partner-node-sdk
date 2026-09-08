@@ -942,6 +942,7 @@ export const sampleTransactionRequest = {
   linkedTrxId: "123",
   method: "cash",
   tip: 500,
+  cashoutAmount: 200,
   trn: "100412786589",
   prepaid: true,
   surcounts: [
@@ -964,6 +965,7 @@ export const sampleTransactionResponse = {
   method: "mastercard",
   amount: "1000",
   tip: 0,
+  cashoutAmount: 200,
   trn: "100412786589",
   acceptLess: false,
   partnerInitiated: true,
