@@ -1,5 +1,5 @@
 /**
- * Internal HTTP layer built on the native `fetch` API (Node >= 20).
+ * Internal HTTP layer built on the native `fetch` API (Node >= 22).
  * Replaces the previous axios transport while preserving the request-config
  * shape and error surface the SDK exposed.
  */
@@ -21,23 +21,17 @@ export interface RequestConfig {
  * Error thrown for non-2xx responses. Mirrors the parts of `AxiosError`
  * consumers commonly rely on (`error.response.status`, `error.response.data`).
  */
-export class HttpError extends Error {
-  readonly response: {
-    status: number;
-    statusText: string;
-    data: any;
-    headers: Record<string, string>;
-  };
+export interface HttpErrorResponse {
+  status: number;
+  statusText: string;
+  data: any;
+  headers: Record<string, string>;
+}
 
-  constructor(
-    message: string,
-    response: {
-      status: number;
-      statusText: string;
-      data: any;
-      headers: Record<string, string>;
-    }
-  ) {
+export class HttpError extends Error {
+  readonly response: HttpErrorResponse;
+
+  constructor(message: string, response: HttpErrorResponse) {
     super(message);
     this.name = "HttpError";
     this.response = response;
@@ -53,7 +47,7 @@ export function buildUrl(
   path: string = "",
   params?: Record<string, any>
 ): string {
-  const url = new URL(`${baseURL}${path}`);
+  const url = new URL(`${baseURL.replace(/\/$/, "")}${path}`);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       if (value === undefined || value === null) continue;
