@@ -1,4 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>doshii-io/doshii-cicd//.github/renovate/minimal-recommended.json5"]
+  "extends": ["github>doshii-io/doshii-cicd//.github/renovate/security-only.json5"]
 }
