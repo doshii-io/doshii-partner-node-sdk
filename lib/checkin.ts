@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { OrderResponse, OrderStatus } from "./order";
 import { Consumer } from "./sharedSchema";
 
@@ -48,9 +48,9 @@ export interface CheckinRetrievalFilters {
 }
 
 export default class Checkin {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
@@ -76,7 +76,7 @@ export default class Checkin {
     checkinId?: string,
     filters?: CheckinRetrievalFilters
   ): Promise<CheckinResponse | Array<CheckinResponse>> {
-    let req: AxiosRequestConfig = {
+    let req: RequestConfig = {
       method: "GET",
       headers: {
         "doshii-location-id": locationId,

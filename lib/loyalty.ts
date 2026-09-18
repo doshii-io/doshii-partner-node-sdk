@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { Surcount, Product } from "./sharedSchema";
 
 interface LoyaltyMember {
@@ -128,9 +128,9 @@ export interface LoyaltyCheckinRetrievalFilters {
 }
 
 export default class Loyalty {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
@@ -151,7 +151,7 @@ export default class Loyalty {
     checkInId?: string,
     filters?: LoyaltyCheckinRetrievalFilters
   ): Promise<Array<LoyaltyCheckinResponse> | LoyaltyCheckinResponse> {
-    let req: AxiosRequestConfig = {
+    let req: RequestConfig = {
       method: "GET",
       headers: {
         "doshii-location-id": locationId,

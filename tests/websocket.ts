@@ -1,4 +1,4 @@
-import Doshii, { WebsocketEvents } from "../lib";
+import Doshii, { WebsocketEvents, LogLevel } from "../lib";
 import WebSocket from "ws";
 import http from 'http';
 
@@ -34,7 +34,11 @@ describe("Websocket", () => {
     doshii = new Doshii(clientId, clientSecret, {
       sandbox: true,
       pingInterval: 500,
-      websocketUrlOverride: `http://localhost:${serverPort}?auth=`
+      websocketUrlOverride: `http://localhost:${serverPort}?auth=`,
+      // Suppress the informational websocket close/error WARN logs. The socket
+      // auto-closes asynchronously during teardown, and that log could otherwise
+      // land after Jest finishes the suite ("Cannot log after tests are done").
+      logLevel: LogLevel.ERROR,
     });
 
     // subscribe to pong to open socket

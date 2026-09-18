@@ -1,5 +1,5 @@
 import { DoshiiEvents } from "./webhook";
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 
 export interface DeviceRegister {
   name: string;
@@ -35,9 +35,9 @@ export interface DeviceResponse extends DeviceRegister {
  * Devices API
  */
 export default class Device {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 

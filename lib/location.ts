@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { LocationClasses } from "./sharedSchema";
 
 export interface LocationResponse {
@@ -95,9 +95,9 @@ export interface LocationHealthRetrievalFilters {
  * Location API
  */
 export default class Location {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
@@ -110,7 +110,7 @@ export default class Location {
   private async get(
     locationId?: string
   ): Promise<Array<LocationResponse> | LocationResponse> {
-    let requestData: AxiosRequestConfig = {
+    let requestData: RequestConfig = {
       method: "GET",
     };
     if (locationId) {
@@ -158,7 +158,7 @@ export default class Location {
     locationId?: string,
     filters?: LocationHealthRetrievalFilters
   ): Promise<Array<LocationHealth> | LocationHealth> {
-    let requestData: AxiosRequestConfig = {
+    let requestData: RequestConfig = {
       method: "GET",
     };
     if (locationId) {
@@ -218,7 +218,7 @@ export default class Location {
     locationId: string,
     terminalId?: string
   ): Promise<Array<LocationTerminal> | LocationTerminal> {
-    let requestData: AxiosRequestConfig = {
+    let requestData: RequestConfig = {
       headers: {
         "doshii-location-id": locationId,
       },
