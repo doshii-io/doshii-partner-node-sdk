@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 
 export enum DoshiiEvents {
   ORDER_CREATED = "order_created",
@@ -59,9 +59,9 @@ export interface WebhookResponse {
  * Webhooks API
  */
 export default class Webhook {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 

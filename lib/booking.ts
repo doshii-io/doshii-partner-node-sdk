@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { Consumer } from "./sharedSchema";
 import { CheckinRequest, CheckinResponse } from "./checkin";
 import { OrderRequest, OrderResponse, OrderResponses } from "./order";
@@ -48,9 +48,9 @@ export interface BookingRequest {
 }
 
 export default class Booking {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 

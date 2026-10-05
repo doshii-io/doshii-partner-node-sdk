@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "./http";
 import { Surcount } from "./sharedSchema";
 
 interface MenuAltNames {
@@ -91,9 +91,9 @@ export interface MenuResponse {
 }
 
 export default class Menu {
-  readonly requestMaker: (data: AxiosRequestConfig) => Promise<any>;
+  readonly requestMaker: (data: RequestConfig) => Promise<any>;
 
-  constructor(requestMaker: (data: AxiosRequestConfig) => Promise<any>) {
+  constructor(requestMaker: (data: RequestConfig) => Promise<any>) {
     this.requestMaker = requestMaker;
   }
 
